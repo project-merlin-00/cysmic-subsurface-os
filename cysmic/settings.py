@@ -28,7 +28,7 @@ INSTALLED_APPS = [
     'cysmic.core',
     'cysmic.agents',
     'cysmic.data',
-    # 'cysmic.rag',   # Enable after implementing
+    'cysmic.rag',
 ]
 
 MIDDLEWARE = [

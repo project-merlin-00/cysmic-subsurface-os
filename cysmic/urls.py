@@ -12,7 +12,7 @@ urlpatterns = [
     path('api/core/', include('cysmic.core.urls')),
     path('api/agents/', include('cysmic.agents.urls')),
     path('api/data/', include('cysmic.data.urls')),
-    # path('api/rag/', include('cysmic.rag.urls')),
+    path('api/rag/', include('cysmic.rag.urls')),
 ]
 
 if settings.DEBUG:
