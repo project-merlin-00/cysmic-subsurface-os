@@ -9,6 +9,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', include('cysmic.dashboard.urls')),
     path('api/core/', include('cysmic.core.urls')),
     path('api/agents/', include('cysmic.agents.urls')),
     path('api/data/', include('cysmic.data.urls')),

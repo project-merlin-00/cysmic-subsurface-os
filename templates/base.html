@@ -1,0 +1,88 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CYSMIC Subsurface OS{% endblock %}</title>
+    
+    <!-- Tailwind + Fonts -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'sandstone-50': '#F9F7F5',
+                        'sandstone-100': '#EBE8E4',
+                        'sandstone-200': '#DCD7D1',
+                        'sandstone-300': '#CDC4BC',
+                        'sandstone-400': '#BDB2A8',
+                        'sandstone-600': '#8C8074',
+                        'sandstone-800': '#5D534A',
+                        'clay': '#A0522D',
+                        'tech-orange': '#E65100',
+                        'strata-grey': '#4A4A4A',
+                        'geo-dark': '#1a1816',
+                    },
+                    fontFamily: {
+                        'display': ['Space Grotesk', 'sans-serif'],
+                        'mono': ['IBM Plex Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body { font-family: 'Space Grotesk', sans-serif; }
+        .mono { font-family: 'IBM Plex Mono', monospace; }
+        .matte-panel {
+            background: rgba(235, 232, 228, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid #BDB2A8;
+        }
+        .matte-panel-dark {
+            background: rgba(31, 41, 55, 0.95);
+            color: #F9F7F5;
+            border: 1px solid #4B5563;
+        }
+        {% block extra_styles %}{% endblock %}
+    </style>
+</head>
+<body class="bg-sandstone-50 text-slate-900">
+    <!-- Header -->
+    <nav class="bg-geo-dark text-white px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-lg bg-tech-orange flex items-center justify-center font-bold text-xl">C</div>
+            <div>
+                <h1 class="text-xl font-semibold">CYSMIC</h1>
+                <p class="text-xs text-sandstone-400">Subsurface Operating System</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-6">
+            <a href="/" class="hover:text-tech-orange transition">Dashboard</a>
+            <a href="/wells/" class="hover:text-tech-orange transition">Wells</a>
+            <a href="/fields/" class="hover:text-tech-orange transition">Fields</a>
+            <a href="/3d/" class="hover:text-tech-orange transition">3D View</a>
+            <a href="/analysis/" class="hover:text-tech-orange transition">Analysis</a>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="p-6">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="text-center py-6 text-sandstone-600 text-sm">
+        <p>CYSMIC Subsurface OS v0.1 • Powered by Agentic AI</p>
+    </footer>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

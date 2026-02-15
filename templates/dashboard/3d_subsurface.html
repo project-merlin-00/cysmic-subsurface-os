@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}3D Subsurface Model - CYSMIC{% endblock %}
+
+{% block content %}
+<div class="matte-panel rounded-xl p-6">
+    <h1 class="text-2xl font-bold mb-4">3D Subsurface Model</h1>
+    <p class="text-sandstone-600 mb-4">Interactive 3D visualization of subsurface structures</p>
+    
+    <div class="bg-geo-dark rounded-xl h-96 flex items-center justify-center">
+        <div class="text-center text-white">
+            <span class="material-symbols-outlined text-6xl mb-4">view_in_ar</span>
+            <p class="text-lg">3D Visualization Panel</p>
+            <p class="text-sm text-sandstone-400">Connect to load well data</p>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-3 gap-4 mt-6">
+        <div class="matte-panel rounded-lg p-4">
+            <h3 class="font-semibold">Wells</h3>
+            <p class="text-2xl text-tech-orange">{{ wells|length|default:0 }}</p>
+        </div>
+        <div class="matte-panel rounded-lg p-4">
+            <h3 class="font-semibold">Depth Range</h3>
+            <p class="text-2xl text-clay">1500-2500m</p>
+        </div>
+        <div class="matte-panel rounded-lg p-4">
+            <h3 class="font-semibold">Layers</h3>
+            <p class="text-2xl text-strata-grey">5</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

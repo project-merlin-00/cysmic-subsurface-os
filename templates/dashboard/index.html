@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}CYSMIC Dashboard{% endblock %}
+
+{% block extra_styles %}
+.bg-tech-grid {
+    background-size: 40px 40px;
+    background-image: linear-gradient(to right, rgba(93, 83, 74, 0.08) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(93, 83, 74, 0.08) 1px, transparent);
+}
+{% endblock %}
+
+{% block content %}
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="matte-panel rounded-xl p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sandstone-600 text-sm">Total Fields</p>
+                <p class="text-3xl font-bold text-geo-dark">{{ total_fields|default:0 }}</p>
+            </div>
+            <span class="material-symbols-outlined text-4xl text-clay">terrain</span>
+        </div>
+    </div>
+    
+    <div class="matte-panel rounded-xl p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sandstone-600 text-sm">Active Wells</p>
+                <p class="text-3xl font-bold text-geo-dark">{{ total_wells|default:0 }}</p>
+            </div>
+            <span class="material-symbols-outlined text-4xl text-tech-orange">oil_barrel</span>
+        </div>
+    </div>
+    
+    <div class="matte-panel rounded-xl p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sandstone-600 text-sm">Well Logs</p>
+                <p class="text-3xl font-bold text-geo-dark">{{ well_logs|length|default:0 }}</p>
+            </div>
+            <span class="material-symbols-outlined text-4xl text-strata-grey">insights</span>
+        </div>
+    </div>
+    
+    <div class="matte-panel rounded-xl p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sandstone-600 text-sm">AI Agents</p>
+                <p class="text-3xl font-bold text-geo-dark">5</p>
+            </div>
+            <span class="material-symbols-outlined text-4xl text-clay">psychology</span>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <a href="/wells/" class="matte-panel rounded-xl p-6 hover:shadow-lg transition group">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-lg bg-tech-orange text-white flex items-center justify-center">
+                <span class="material-symbols-outlined">add_circle</span>
+            </div>
+            <div>
+                <h3 class="font-semibold text-lg group-hover:text-tech-orange transition">Upload Well Log</h3>
+                <p class="text-sm text-sandstone-600">LAS, DLIS, CSV, SEG-Y</p>
+            </div>
+        </div>
+    </a>
+    
+    <a href="/analysis/" class="matte-panel rounded-xl p-6 hover:shadow-lg transition group">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-lg bg-clay text-white flex items-center justify-center">
+                <span class="material-symbols-outlined">analytics</span>
+            </div>
+            <div>
+                <h3 class="font-semibold text-lg group-hover:text-clay transition">Run Analysis</h3>
+                <p class="text-sm text-sandstone-600">Petrophysics, Reservoir</p>
+            </div>
+        </div>
+    </a>
+    
+    <a href="/3d/" class="matte-panel rounded-xl p-6 hover:shadow-lg transition group">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-lg bg-strata-grey text-white flex items-center justify-center">
+                <span class="material-symbols-outlined">view_in_ar</span>
+            </div>
+            <div>
+                <h3 class="font-semibold text-lg group-hover:text-strata-grey transition">3D Visualization</h3>
+                <p class="text-sm text-sandstone-600">Subsurface model</p>
+            </div>
+        </div>
+    </a>
+</div>
+
+<!-- Recent Activity -->
+<div class="matte-panel rounded-xl p-6">
+    <h2 class="text-xl font-semibold mb-4">Recent Fields</h2>
+    
+    {% if fields %}
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead>
+                <tr class="border-b border-sandstone-200">
+                    <th class="text-left py-3 px-4">Name</th>
+                    <th class="text-left py-3 px-4">Location</th>
+                    <th class="text-left py-3 px-4">Operator</th>
+                    <th class="text-left py-3 px-4">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for field in fields %}
+                <tr class="border-b border-sandstone-100 hover:bg-sandstone-50">
+                    <td class="py-3 px-4 font-medium">{{ field.name }}</td>
+                    <td class="py-3 px-4">{{ field.location|default:"-" }}</td>
+                    <td class="py-3 px-4">{{ field.operator|default:"-" }}</td>
+                    <td class="py-3 px-4">
+                        <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+                            {{ field.status|default:"Active" }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-8 text-sandstone-500">
+        <span class="material-symbols-outlined text-4xl mb-2">folder_open</span>
+        <p>No fields yet. Create your first field to get started.</p>
+        <a href="/fields/" class="inline-block mt-4 px-4 py-2 bg-tech-orange text-white rounded-lg hover:bg-orange-700">
+            Add Field
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- LAS Parser Demo -->
+<div class="matte-panel rounded-xl p-6 mt-6">
+    <h2 class="text-xl font-semibold mb-4">Quick Parse Demo</h2>
+    <p class="text-sandstone-600 mb-4">Test the LAS parser with sample data from Lake Albert, Uganda</p>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+            <label class="block text-sm font-medium mb-2">LAS Content</label>
+            <textarea id="lasInput" class="w-full h-48 p-3 border border-sandstone-300 rounded-lg font-mono text-xs" placeholder="Paste LAS content here...">~VERSION INFORMATION
+VERS.                  2.0   CWLS
+~CURVE INFORMATION
+DEPTH.M                ~Depth
+GR  .GAPI              ~Gamma Ray
+~A ASCII DATA
+1000.0  50.0
+1001.0  52.0
+1002.0  48.0
+1003.0  55.0</textarea>
+        </div>
+        <div>
+            <label class="block text-sm font-medium mb-2">Result</label>
+            <div id="parseResult" class="w-full h-48 p-3 bg-sandstone-100 rounded-lg font-mono text-xs overflow-auto">
+                Click "Parse" to test...
+            </div>
+        </div>
+    </div>
+    
+    <button onclick="parseLAS()" class="mt-4 px-6 py-2 bg-tech-orange text-white rounded-lg hover:bg-orange-700 transition">
+        Parse LAS
+    </button>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function parseLAS() {
+    const content = document.getElementById('lasInput').value;
+    const resultDiv = document.getElementById('parseResult');
+    
+    resultDiv.textContent = 'Parsing...';
+    
+    try {
+        const response = await fetch('/dashboard/api/parse-las/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ content })
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+            resultDiv.textContent = 'Error: ' + data.error;
+        } else {
+            resultDiv.textContent = JSON.stringify(data, null, 2);
+        }
+    } catch (e) {
+        resultDiv.textContent = 'Error: ' + e.message;
+    }
+}
+</script>
+{% endblock %}
