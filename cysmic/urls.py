@@ -10,8 +10,8 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/core/', include('cysmic.core.urls')),
-    # path('api/agents/', include('cysmic.agents.urls')),  # Enable after implementing
-    # path('api/data/', include('cysmic.data.urls')),
+    path('api/agents/', include('cysmic.agents.urls')),
+    path('api/data/', include('cysmic.data.urls')),
     # path('api/rag/', include('cysmic.rag.urls')),
 ]
 

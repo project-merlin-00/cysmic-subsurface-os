@@ -27,7 +27,7 @@ INSTALLED_APPS = [
     # Local apps
     'cysmic.core',
     'cysmic.agents',
-    # 'cysmic.data',  # Enable after implementing
+    'cysmic.data',
     # 'cysmic.rag',   # Enable after implementing
 ]
 
