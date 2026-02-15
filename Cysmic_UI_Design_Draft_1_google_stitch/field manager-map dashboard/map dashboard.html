@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cysmic Field Manager: Unified Edition</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "cysmic-primary": "#b35934",
+                        "cysmic-bg": "#f2f1ef",
+                        "cysmic-panel": "#ecebe9",
+                        "cysmic-border": "#d6d3d0",
+                        "cysmic-text": "#33302e",
+                        "cysmic-muted": "#78716c",
+                        "cysmic-slate": "#4a4744",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "2px",
+                        "md": "4px",
+                        "lg": "8px",
+                    },
+                    boxShadow: {
+                        'neomorph': '4px 4px 10px #e0dedb, -4px -4px 10px #ffffff',
+                        'inset-soft': 'inset 2px 2px 5px #e0dedb, inset -2px -2px 5px #ffffff',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #f2f1ef;
+            color: #33302e;
+        }
+        .geological-border {
+            border: 1px solid #d6d3d0;
+            clip-path: polygon(
+                0 0, 
+                100% 0, 
+                100% calc(100% - 10px), 
+                calc(100% - 10px) 100%, 
+                0 100%
+            );
+        }
+        .geological-border-alt {
+            border: 1px solid #d6d3d0;
+            clip-path: polygon(
+                10px 0, 
+                100% 0, 
+                100% 100%, 
+                0 100%, 
+                0 10px
+            );
+        }
+        .grid-bg {
+            background-image: 
+                linear-gradient(to right, rgba(179, 89, 52, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(179, 89, 52, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #d6d3d0;
+            border-radius: 2px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #b35934;
+        }
+    </style>
+</head>
+<body class="bg-cysmic-bg text-cysmic-text h-screen w-screen overflow-hidden flex selection:bg-cysmic-primary selection:text-white">
+<nav class="w-64 bg-cysmic-panel border-r border-cysmic-border flex flex-col h-full z-20 shadow-sm relative">
+<div class="p-6 pb-2 border-b border-cysmic-border/50">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-8 h-8 bg-cysmic-primary text-white flex items-center justify-center rounded-sm shadow-md">
+<span class="material-symbols-outlined text-lg">hexagon</span>
+</div>
+<div class="flex flex-col">
+<span class="text-lg font-bold tracking-widest leading-none">CYSMIC</span>
+<span class="text-[9px] uppercase tracking-widest text-cysmic-muted mt-0.5">Unified Field OS</span>
+</div>
+</div>
+<div class="relative mb-4">
+<span class="absolute left-2 top-2 text-cysmic-muted material-symbols-outlined text-sm">search</span>
+<input class="w-full bg-cysmic-bg border border-cysmic-border rounded pl-8 pr-2 py-1.5 text-xs focus:ring-1 focus:ring-cysmic-primary focus:border-cysmic-primary outline-none" placeholder="Search Assets..." type="text"/>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-1">
+<div class="text-[10px] font-bold text-cysmic-muted uppercase tracking-widest px-3 py-2">Modules</div>
+<a class="flex items-center gap-3 px-3 py-2 bg-cysmic-bg border border-cysmic-border rounded text-cysmic-primary font-medium text-xs" href="#">
+<span class="material-symbols-outlined text-sm">map</span>
+                Field Manager
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-cysmic-muted hover:text-cysmic-primary hover:bg-white transition-colors rounded text-xs" href="#">
+<span class="material-symbols-outlined text-sm">view_in_ar</span>
+                3D Subsurface
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-cysmic-muted hover:text-cysmic-primary hover:bg-white transition-colors rounded text-xs" href="#">
+<span class="material-symbols-outlined text-sm">analytics</span>
+                Analysis Canvas
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-cysmic-muted hover:text-cysmic-primary hover:bg-white transition-colors rounded text-xs" href="#">
+<span class="material-symbols-outlined text-sm">inventory_2</span>
+                Assets
+            </a>
+<div class="my-4 border-t border-cysmic-border/50"></div>
+<div class="text-[10px] font-bold text-cysmic-muted uppercase tracking-widest px-3 py-2 flex justify-between items-center">
+<span>Active Fields</span>
+<span class="text-cysmic-primary text-[9px] border border-cysmic-primary/20 bg-cysmic-primary/5 px-1 rounded">LIVE</span>
+</div>
+<div class="space-y-2 px-1">
+<div class="p-2 border border-cysmic-border/50 bg-white/50 rounded hover:border-cysmic-primary/50 cursor-pointer group transition-all">
+<div class="flex justify-between items-center mb-1">
+<span class="text-[11px] font-bold text-cysmic-slate group-hover:text-cysmic-primary">Lake Albert B</span>
+<span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+</div>
+<div class="w-full bg-gray-200 h-1 rounded-full overflow-hidden">
+<div class="bg-cysmic-primary h-full w-[82%]"></div>
+</div>
+<div class="flex justify-between text-[9px] text-cysmic-muted mt-1 font-mono">
+<span>UGANDA</span>
+<span>82%</span>
+</div>
+</div>
+<div class="p-2 border border-cysmic-border/50 bg-white/50 rounded hover:border-cysmic-primary/50 cursor-pointer group transition-all">
+<div class="flex justify-between items-center mb-1">
+<span class="text-[11px] font-bold text-cysmic-slate group-hover:text-cysmic-primary">Niger Delta</span>
+<span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>
+</div>
+<div class="w-full bg-gray-200 h-1 rounded-full overflow-hidden">
+<div class="bg-cysmic-slate h-full w-[65%]"></div>
+</div>
+<div class="flex justify-between text-[9px] text-cysmic-muted mt-1 font-mono">
+<span>NIGERIA</span>
+<span>65%</span>
+</div>
+</div>
+<div class="p-2 border border-cysmic-border/50 bg-white/50 rounded hover:border-cysmic-primary/50 cursor-pointer group transition-all">
+<div class="flex justify-between items-center mb-1">
+<span class="text-[11px] font-bold text-cysmic-slate group-hover:text-cysmic-primary">Kwanza Basin</span>
+<span class="w-1.5 h-1.5 rounded-full bg-cysmic-primary"></span>
+</div>
+<div class="w-full bg-gray-200 h-1 rounded-full overflow-hidden">
+<div class="bg-red-500 h-full w-[45%]"></div>
+</div>
+<div class="flex justify-between text-[9px] text-cysmic-muted mt-1 font-mono">
+<span>ANGOLA</span>
+<span>45%</span>
+</div>
+</div>
+</div>
+</div>
+<div class="p-4 border-t border-cysmic-border bg-white/30 backdrop-blur-sm">
+<div class="flex items-center justify-between mb-3">
+<span class="text-[10px] font-bold uppercase tracking-wider text-cysmic-muted">Live Feed</span>
+<span class="material-symbols-outlined text-[10px] text-green-600 animate-pulse">fiber_manual_record</span>
+</div>
+<div class="text-[10px] leading-tight text-cysmic-slate font-mono border-l-2 border-cysmic-primary pl-2 py-1 mb-4 bg-cysmic-bg/50">
+<span class="text-cysmic-primary">10:42 AM</span> Pressure anomaly detected in Sector 4. AI rerouting fluid dynamics.
+            </div>
+<div class="flex items-center gap-3 pt-3 border-t border-cysmic-border/50">
+<div class="w-8 h-8 rounded bg-cysmic-slate text-white flex items-center justify-center font-bold text-xs shadow-sm">
+                    JD
+                </div>
+<div class="flex flex-col">
+<span class="text-xs font-bold text-cysmic-text">J. Doe</span>
+<span class="text-[9px] text-cysmic-muted uppercase">Lead Geologist</span>
+</div>
+<button class="ml-auto text-cysmic-muted hover:text-cysmic-primary">
+<span class="material-symbols-outlined text-lg">settings</span>
+</button>
+</div>
+</div>
+</nav>
+<main class="flex-1 flex flex-col relative overflow-hidden bg-cysmic-bg">
+<header class="h-12 border-b border-cysmic-border flex items-center justify-between px-6 bg-white/50 backdrop-blur-sm z-10">
+<div class="flex items-center gap-2">
+<span class="text-xs font-bold uppercase text-cysmic-muted tracking-widest">View Mode:</span>
+<button class="px-2 py-0.5 bg-cysmic-primary text-white text-[10px] uppercase font-bold tracking-wider rounded-sm">Topographic</button>
+<button class="px-2 py-0.5 text-cysmic-slate hover:bg-cysmic-border/30 text-[10px] uppercase font-bold tracking-wider rounded-sm transition-colors">Seismic</button>
+<button class="px-2 py-0.5 text-cysmic-slate hover:bg-cysmic-border/30 text-[10px] uppercase font-bold tracking-wider rounded-sm transition-colors">Infrared</button>
+</div>
+<div class="flex items-center gap-4 text-[10px] font-mono text-cysmic-muted">
+<span>LAT: 8.7832° S</span>
+<span>LON: 34.5085° E</span>
+<span>ALT: 1205m</span>
+</div>
+</header>
+<div class="flex-1 flex overflow-hidden relative">
+<section class="flex-1 relative bg-cysmic-bg grid-bg overflow-hidden">
+<div class="absolute inset-0 flex items-center justify-center">
+<img alt="3D topographic map of Africa" class="w-full h-full object-cover opacity-90 mix-blend-multiply contrast-125 sepia-[.2]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC38i9pF-W35ryNJYit6Mf7XrA9aGsUdUbaC8RyuemVHaRNH7thnUxNhgYW8SUjdrvc3bsRR8SYBfXEGvoZvnVdu3nP5YcuWiwjh-l81BMDg_T9bXJbcTEWXlyEUefgSptz0__Qpx902YntlH_yf60_L13m5AE-484jujcem4saQ5pW99EI4lU2DDgui-TPvYaTb2EJ3ZdoUtpEvm2B-N1S7wGkXddWxSPJRiv3dpE2xVEjFd-zQXDhhvVnf-xb4Xda2u6RoprIoIA" style="mask-image: radial-gradient(circle at center, black 50%, transparent 100%);"/>
+</div>
+<div class="absolute top-[28%] left-[58%] group cursor-pointer">
+<div class="relative flex items-center justify-center">
+<div class="absolute w-16 h-16 border border-cysmic-primary/30 rounded-full animate-ping"></div>
+<div class="absolute w-24 h-24 border border-cysmic-primary/10 rounded-full animate-pulse"></div>
+<div class="w-2 h-2 bg-cysmic-primary rotate-45 transform border border-white shadow-lg z-20"></div>
+<div class="h-12 w-[1px] bg-cysmic-primary/50 absolute bottom-2 left-1/2 -translate-x-1/2 origin-bottom rotate-[30deg]"></div>
+</div>
+<div class="absolute -top-12 left-6 bg-white/90 backdrop-blur-md border border-cysmic-primary/30 p-2 pl-3 shadow-lg geological-border min-w-[140px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+<div class="text-[9px] uppercase text-cysmic-primary font-bold tracking-widest mb-0.5">Lake Albert B</div>
+<div class="text-[10px] text-cysmic-slate font-medium leading-tight">Optimizing Extraction</div>
+<div class="w-full h-0.5 bg-cysmic-border mt-1">
+<div class="h-full bg-cysmic-primary w-[75%]"></div>
+</div>
+</div>
+</div>
+<div class="absolute bottom-[45%] left-[38%] group cursor-pointer">
+<div class="relative flex items-center justify-center">
+<div class="w-2 h-2 bg-cysmic-slate rotate-45 transform border border-white shadow-lg z-20"></div>
+</div>
+<div class="absolute -top-10 left-6 bg-white/90 backdrop-blur-md border border-cysmic-border p-2 pl-3 shadow-lg geological-border min-w-[120px]">
+<div class="text-[9px] uppercase text-cysmic-slate font-bold tracking-widest mb-0.5">Niger Delta</div>
+<div class="text-[10px] text-cysmic-muted font-medium">Stable Operations</div>
+</div>
+</div>
+<div class="absolute bottom-8 right-8 flex flex-col gap-2">
+<div class="bg-white border border-cysmic-border p-1 shadow-sm flex flex-col gap-1">
+<button class="w-8 h-8 flex items-center justify-center hover:bg-cysmic-bg text-cysmic-slate hover:text-cysmic-primary transition-colors">
+<span class="material-symbols-outlined text-lg">add</span>
+</button>
+<div class="h-px bg-cysmic-border mx-1"></div>
+<button class="w-8 h-8 flex items-center justify-center hover:bg-cysmic-bg text-cysmic-slate hover:text-cysmic-primary transition-colors">
+<span class="material-symbols-outlined text-lg">remove</span>
+</button>
+</div>
+<button class="w-10 h-10 bg-white border border-cysmic-border flex items-center justify-center text-cysmic-slate hover:text-cysmic-primary transition-colors shadow-sm hover:bg-cysmic-bg">
+<span class="material-symbols-outlined text-xl">layers</span>
+</button>
+</div>
+<div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-30 w-full max-w-lg">
+<div class="relative">
+<div class="absolute inset-0 bg-white/80 backdrop-blur-xl rounded-full shadow-2xl border border-white/50"></div>
+<div class="relative flex items-center px-2 py-2">
+<div class="w-10 h-10 bg-gradient-to-br from-cysmic-primary to-[#8a4224] rounded-full flex items-center justify-center shadow-lg text-white mr-3 shrink-0">
+<span class="material-icons text-lg">diamond</span>
+</div>
+<input class="bg-transparent border-none focus:ring-0 text-cysmic-slate placeholder-cysmic-muted/70 w-full text-sm font-medium" placeholder="Ask Cysmic Agent to analyze seismic data..." type="text"/>
+<div class="flex items-center gap-1 pr-2">
+<button class="p-1.5 rounded-full hover:bg-cysmic-bg text-cysmic-muted transition-colors">
+<span class="material-symbols-outlined text-lg">mic</span>
+</button>
+<button class="p-1.5 rounded-full bg-cysmic-bg border border-cysmic-border hover:border-cysmic-primary text-cysmic-primary transition-colors">
+<span class="material-symbols-outlined text-lg">arrow_upward</span>
+</button>
+</div>
+</div>
+</div>
+<div class="flex justify-center gap-2 mt-3 opacity-0 hover:opacity-100 transition-opacity duration-300">
+<button class="bg-white/60 backdrop-blur border border-cysmic-border px-3 py-1 rounded-full text-[10px] font-medium text-cysmic-slate hover:bg-white hover:text-cysmic-primary shadow-sm transition-colors">Show Reserves &gt; 500M</button>
+<button class="bg-white/60 backdrop-blur border border-cysmic-border px-3 py-1 rounded-full text-[10px] font-medium text-cysmic-slate hover:bg-white hover:text-cysmic-primary shadow-sm transition-colors">Heatmap Overlay</button>
+</div>
+</div>
+</section>
+<aside class="w-[400px] border-l border-cysmic-border bg-cysmic-bg/95 flex flex-col overflow-y-auto custom-scrollbar z-10">
+<div class="p-6 pb-2">
+<div class="bg-white border border-cysmic-border p-5 relative shadow-sm geological-border-alt hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-cysmic-primary text-base">oil_barrel</span>
+<h3 class="text-[10px] font-bold uppercase tracking-widest text-cysmic-muted">Regional Production</h3>
+</div>
+<span class="text-[9px] bg-green-50 text-green-700 px-1.5 py-0.5 border border-green-200 rounded font-mono font-bold">+2.4%</span>
+</div>
+<div class="flex items-baseline gap-2 mt-2">
+<span class="text-4xl font-bold text-cysmic-slate tabular-nums tracking-tighter">1.22</span>
+<span class="text-sm font-bold text-cysmic-primary tracking-tighter">M bbl/d</span>
+</div>
+<div class="mt-4 flex flex-col gap-1">
+<div class="flex justify-between text-[9px] font-mono text-cysmic-muted uppercase">
+<span>Efficiency</span>
+<span>82%</span>
+</div>
+<div class="flex gap-0.5 h-1.5 w-full">
+<div class="bg-cysmic-primary h-full w-[20%] rounded-l-sm"></div>
+<div class="bg-cysmic-primary h-full w-[20%]"></div>
+<div class="bg-cysmic-primary h-full w-[20%]"></div>
+<div class="bg-cysmic-primary h-full w-[22%]"></div>
+<div class="bg-cysmic-border h-full flex-1 rounded-r-sm"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="px-6 py-2">
+<div class="bg-white border border-cysmic-border p-5 relative shadow-sm geological-border hover:shadow-md transition-shadow">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-cysmic-primary text-base">precision_manufacturing</span>
+<h3 class="text-[10px] font-bold uppercase tracking-widest text-cysmic-muted">Active Rig Count</h3>
+</div>
+<div class="flex items-center gap-6">
+<div class="text-4xl font-bold text-cysmic-slate tabular-nums tracking-tighter">12</div>
+<div class="grid grid-cols-4 gap-1.5 flex-1">
+<div class="h-8 bg-cysmic-panel border border-cysmic-border rounded-sm flex items-center justify-center">
+<span class="w-1.5 h-1.5 bg-cysmic-slate rounded-full"></span>
+</div>
+<div class="h-8 bg-cysmic-panel border border-cysmic-border rounded-sm flex items-center justify-center">
+<span class="w-1.5 h-1.5 bg-cysmic-slate rounded-full"></span>
+</div>
+<div class="h-8 bg-cysmic-panel border border-cysmic-border rounded-sm flex items-center justify-center">
+<span class="w-1.5 h-1.5 bg-cysmic-slate rounded-full"></span>
+</div>
+<div class="h-8 bg-cysmic-panel border border-cysmic-border rounded-sm flex items-center justify-center">
+<span class="w-1.5 h-1.5 bg-cysmic-slate rounded-full"></span>
+</div>
+<div class="h-8 bg-cysmic-panel border border-cysmic-border rounded-sm flex items-center justify-center">
+<span class="w-1.5 h-1.5 bg-cysmic-slate rounded-full"></span>
+</div>
+<div class="h-8 bg-cysmic-panel border border-cysmic-border rounded-sm flex items-center justify-center">
+<span class="w-1.5 h-1.5 bg-cysmic-slate rounded-full"></span>
+</div>
+<div class="h-8 bg-white border border-cysmic-primary/50 rounded-sm flex items-center justify-center shadow-inner relative overflow-hidden group">
+<div class="absolute inset-0 bg-cysmic-primary/10"></div>
+<span class="material-symbols-outlined text-[10px] text-cysmic-primary">build</span>
+</div>
+<div class="h-8 bg-white border border-cysmic-primary/50 rounded-sm flex items-center justify-center shadow-inner relative overflow-hidden">
+<div class="absolute inset-0 bg-cysmic-primary/10"></div>
+<span class="material-symbols-outlined text-[10px] text-cysmic-primary">build</span>
+</div>
+</div>
+</div>
+<p class="mt-3 text-[10px] text-cysmic-muted leading-relaxed font-mono border-t border-cysmic-border pt-2">
+                            &gt; Maintenance scheduled for Block-12<br/>
+                            &gt; ETA: 14h 20m
+                        </p>
+</div>
+</div>
+<div class="px-6 py-2">
+<div class="bg-white border border-cysmic-border p-5 relative shadow-sm geological-border-alt hover:shadow-md transition-shadow">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-cysmic-primary text-base">psychology</span>
+<h3 class="text-[10px] font-bold uppercase tracking-widest text-cysmic-muted">AI Predicted Reserves</h3>
+</div>
+<div class="relative h-32 w-full border border-cysmic-border bg-cysmic-bg/30 rounded-sm overflow-hidden mb-3">
+<div class="absolute inset-0" style="background-image: linear-gradient(#d6d3d0 1px, transparent 1px), linear-gradient(90deg, #d6d3d0 1px, transparent 1px); background-size: 20px 20px; opacity: 0.3;">
+</div>
+<svg class="w-full h-full preserve-3d" viewBox="0 0 100 50">
+<path d="M 0 45 L 20 42 L 40 35 L 60 25 L 80 20 L 100 15" fill="none" stroke="#b35934" stroke-dasharray="2,1" stroke-width="1.5"></path>
+<path d="M 0 45 L 20 42 L 40 38 L 60 30 L 80 28 L 100 25" fill="none" stroke="#d6d3d0" stroke-width="1.5"></path>
+<circle class="animate-pulse" cx="60" cy="25" fill="#b35934" r="2"></circle>
+<circle cx="100" cy="15" fill="#b35934" r="2"></circle>
+<path d="M 0 45 L 20 42 L 40 35 L 60 25 L 80 20 L 100 15 V 50 H 0 Z" fill="url(#gradient)" opacity="0.1"></path>
+<defs>
+<linearGradient id="gradient" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" style="stop-color:#b35934;stop-opacity:1"></stop>
+<stop offset="100%" style="stop-color:#b35934;stop-opacity:0"></stop>
+</linearGradient>
+</defs>
+</svg>
+<div class="absolute top-2 right-2 px-1.5 py-0.5 bg-white border border-cysmic-border text-[8px] font-bold text-cysmic-primary rounded shadow-sm">
+                                +5Y PROJECTION
+                            </div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div class="bg-cysmic-bg/50 p-2 rounded border border-cysmic-border/50">
+<div class="text-[9px] text-cysmic-muted uppercase mb-1">Confidence</div>
+<div class="text-sm font-bold text-cysmic-slate font-mono">94.2%</div>
+</div>
+<div class="bg-cysmic-bg/50 p-2 rounded border border-cysmic-border/50">
+<div class="text-[9px] text-cysmic-muted uppercase mb-1">CAGR</div>
+<div class="text-sm font-bold text-green-600 font-mono">+5.1%</div>
+</div>
+</div>
+</div>
+</div>
+<div class="px-6 py-2 pb-6">
+<div class="p-4 bg-gradient-to-br from-[#fffbf9] to-white border border-cysmic-border border-l-[3px] border-l-cysmic-primary shadow-sm rounded-r-sm relative overflow-hidden">
+<div class="absolute top-0 right-0 p-1 opacity-10">
+<span class="material-symbols-outlined text-4xl text-cysmic-primary">auto_awesome</span>
+</div>
+<div class="flex items-center gap-2 mb-2 relative z-10">
+<span class="material-symbols-outlined text-cysmic-primary text-sm">auto_awesome</span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-cysmic-primary">Cysmic AI Intel</span>
+</div>
+<p class="text-[11px] text-cysmic-slate leading-relaxed italic relative z-10">
+                            "Subsurface thermal variance detected in Lake Albert Sector 4. Recommending proactive casing pressure check within next 8 operational hours."
+                        </p>
+<div class="mt-3 flex gap-2">
+<button class="px-3 py-1 bg-white border border-cysmic-border text-[9px] font-bold text-cysmic-muted uppercase hover:text-cysmic-primary hover:border-cysmic-primary transition-colors rounded-sm shadow-sm">Dismiss</button>
+<button class="px-3 py-1 bg-cysmic-primary text-white text-[9px] font-bold uppercase hover:bg-cysmic-primary/90 transition-colors rounded-sm shadow-sm flex items-center gap-1">
+<span>Action</span>
+<span class="material-icons text-[10px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</main>
+<div class="fixed inset-0 pointer-events-none z-[100] opacity-[0.03] pointer-events-none" style="background: repeating-linear-gradient(0deg, transparent, transparent 1px, #000 1px, #000 2px);"></div>
+
+</body></html>

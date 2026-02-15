@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Analysis Canvas | Technical Workspace</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#A34E2E", // Deep Terracotta
+                        "background-light": "#F2F1ED", // Sandstone Light
+                        "background-dark": "#121210", // Dark Obsidian
+                        "sandstone-100": "#E9E7E1",
+                        "sandstone-200": "#DCD9D1",
+                        "sandstone-300": "#C4C0B4",
+                        "sandstone-700": "#4A4741",
+                    },
+                    fontFamily: {
+                        display: ["JetBrains Mono", "monospace"],
+                        sans: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "2px",
+                    },
+                },
+            },
+        };
+    </script>
+<style>
+        .grid-bg {
+            background-image: 
+                linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        .dark .grid-bg {
+            background-image: 
+                linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+        }
+        body { font-family: 'JetBrains Mono', monospace; }
+        .technical-text { font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; }
+        .scrolling-content::-webkit-scrollbar { width: 4px; }
+        .scrolling-content::-webkit-scrollbar-thumb { background: #C4C0B4; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 min-h-screen flex overflow-hidden">
+<aside class="w-16 border-r border-sandstone-300 dark:border-sandstone-700 flex flex-col items-center py-6 bg-sandstone-100 dark:bg-zinc-900 z-10">
+<div class="mb-8 p-2 bg-sandstone-700 text-white rounded">
+<span class="material-icons-outlined">terrain</span>
+</div>
+<nav class="flex flex-col gap-6 text-slate-500">
+<button class="hover:text-primary transition-colors"><span class="material-icons-outlined">grid_view</span></button>
+<button class="text-primary"><span class="material-icons-outlined">analytics</span></button>
+<button class="hover:text-primary transition-colors"><span class="material-icons-outlined">insights</span></button>
+<button class="hover:text-primary transition-colors"><span class="material-icons-outlined">layers</span></button>
+</nav>
+<div class="mt-auto flex flex-col gap-6 items-center">
+<button class="text-slate-500 hover:text-primary"><span class="material-icons-outlined">settings</span></button>
+<div class="w-8 h-8 rounded-full bg-sandstone-300 dark:bg-sandstone-700 flex items-center justify-center text-xs font-bold">JD</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col relative overflow-hidden grid-bg">
+<header class="h-14 border-b border-sandstone-300 dark:border-sandstone-700 flex items-center justify-between px-6 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm">
+<div class="flex items-center gap-4">
+<h1 class="font-bold tracking-tight text-sm uppercase">Analysis Canvas</h1>
+<span class="text-sandstone-300 dark:text-sandstone-700">|</span>
+<div class="flex items-center gap-2 technical-text opacity-70">
+<span class="material-icons-outlined text-primary text-sm">location_on</span>
+<span>Lake Albert B // Sector 4</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-4 py-1.5 border border-sandstone-300 dark:border-sandstone-700 text-[10px] font-bold hover:bg-sandstone-100 dark:hover:bg-zinc-800 transition-all uppercase tracking-wider">Export Data</button>
+<button class="px-4 py-1.5 bg-sandstone-700 dark:bg-stone-300 text-white dark:text-black text-[10px] font-bold hover:opacity-90 transition-all uppercase tracking-wider">Share Analysis</button>
+</div>
+</header>
+<div class="flex-1 grid grid-cols-12 gap-6 p-6 overflow-hidden">
+<div class="col-span-5 flex flex-col gap-6 overflow-hidden">
+<div class="flex-1 bg-white/40 dark:bg-zinc-900/40 border border-sandstone-300 dark:border-sandstone-700 flex flex-col p-6 overflow-y-auto scrolling-content">
+<div class="flex justify-end mb-8">
+<div class="max-w-[85%] bg-sandstone-200 dark:bg-sandstone-700/50 p-4 border border-sandstone-300 dark:border-sandstone-600">
+<p class="text-sm leading-relaxed">Run pressure decline analysis for Lake Albert B. Focus on the last 18 months and include DCA curves.</p>
+<span class="block text-[10px] mt-2 opacity-50 uppercase text-right">14:02:11 UTC</span>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-6 h-6 bg-sandstone-700 flex items-center justify-center rounded-sm">
+<span class="material-icons-outlined text-[14px] text-white">smart_toy</span>
+</div>
+<span class="technical-text text-primary font-bold">Cysmic Agent V3.0</span>
+</div>
+<div class="space-y-4">
+<div class="flex items-start gap-2">
+<span class="material-icons-outlined text-green-600 text-[16px]">check_circle</span>
+<div>
+<p class="text-xs font-semibold">Retrieving pressure transients from Well AL-104...</p>
+<p class="text-[11px] opacity-60">Found 5,420 datapoints from IoT Sensor Grid.</p>
+</div>
+</div>
+<div class="flex items-start gap-2">
+<span class="material-icons-outlined text-green-600 text-[16px]">check_circle</span>
+<div>
+<p class="text-xs font-semibold">Computing Arps Decline Curves</p>
+<p class="text-[11px] opacity-60">b-factor: 0.45; Di (initial): 12% annual.</p>
+</div>
+</div>
+<div class="flex items-start gap-2">
+<span class="material-icons-outlined text-primary animate-spin text-[16px]">sync</span>
+<div>
+<p class="text-xs font-semibold">Synthesizing multi-variate correlations...</p>
+</div>
+</div>
+<div class="w-full h-[6px] bg-sandstone-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 65%;"></div>
+</div>
+<div class="mt-6 p-4 border border-sandstone-300 dark:border-sandstone-700 bg-white/60 dark:bg-zinc-800/60 leading-relaxed">
+<p class="text-sm">Based on the analysis, Lake Albert B is showing a steeper-than-expected pressure decline in the Eastern lobe. The current <span class="font-bold underline decoration-primary">DCA (Decline Curve Analysis)</span> suggests a primary recovery efficiency of 24.2% unless water injection is optimized by Q4.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="h-16 bg-white/60 dark:bg-zinc-900/60 border border-sandstone-300 dark:border-sandstone-700 flex items-center px-4 gap-4">
+<span class="material-icons-outlined text-primary">psychology</span>
+<input class="bg-transparent border-none focus:ring-0 flex-1 text-sm" placeholder="Refine analysis: 'Check interference from AL-105'..." type="text"/>
+<button class="bg-sandstone-700 p-2 text-white hover:bg-primary transition-colors">
+<span class="material-icons-outlined rotate-[-45deg]">send</span>
+</button>
+</div>
+</div>
+<div class="col-span-4 flex flex-col gap-6">
+<div class="flex-1 bg-white/40 dark:bg-zinc-900/40 border border-sandstone-300 dark:border-sandstone-700 p-5 flex flex-col">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="technical-text opacity-60 font-bold">Decline Curve Analysis</h3>
+<p class="text-xs">Model: Hyperbolic Arps</p>
+</div>
+<span class="material-icons-outlined opacity-40">show_chart</span>
+</div>
+<div class="flex-1 relative flex items-center justify-center overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-b from-sandstone-100 to-sandstone-300 dark:from-zinc-800 dark:to-zinc-900 flex flex-col justify-around px-2">
+<div class="w-full border-t border-dashed border-sandstone-400 dark:border-sandstone-600 opacity-50"></div>
+<div class="w-full border-t border-dashed border-sandstone-400 dark:border-sandstone-600 opacity-50"></div>
+<div class="w-full border-t border-dashed border-sandstone-400 dark:border-sandstone-600 opacity-50"></div>
+<div class="w-full border-t border-dashed border-sandstone-400 dark:border-sandstone-600 opacity-50"></div>
+</div>
+<svg class="absolute inset-0 h-full w-full" preserveAspectRatio="none">
+<path class="text-primary stroke-2" d="M0 40 Q 150 60 300 120 T 600 240" fill="none" stroke="currentColor"></path>
+</svg>
+<div class="absolute bottom-4 right-4 bg-sandstone-700 text-white px-2 py-0.5 text-[8px] uppercase tracking-widest font-bold">P90 Forecast Line</div>
+</div>
+</div>
+<div class="flex-1 bg-white/40 dark:bg-zinc-900/40 border border-sandstone-300 dark:border-sandstone-700 p-5 flex flex-col">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="technical-text opacity-60 font-bold">Volumetric Estimates</h3>
+<p class="text-xs">STOOIP Calculation</p>
+</div>
+<span class="material-icons-outlined opacity-40">layers</span>
+</div>
+<div class="flex-1 bg-black/90 relative p-4 overflow-hidden">
+<div class="flex items-center gap-2 mb-2">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="text-[8px] uppercase tracking-widest text-white/50">Interactive Context</span>
+</div>
+<div class="w-full h-full flex items-center justify-center opacity-40">
+<img alt="Topographic abstraction" class="grayscale invert dark:invert-0 scale-125 object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBL8KCHFylsY3y0u-MT7pqu9_-Mqg33sA3Kjk9PIFCL9yviM9nxXG-bnzgDR_3nnL_d2T2Ma4EIGuilcP1ja49wtl_trR3w3x4fw_6iUN70YpiDV0sptNlIWz1dz-42GRsw1y_cZQ1WnYClRhLQwFiK9VWtZ2Mzu9FGeqimfkvighTG2wZHtS0ZjApv1nO5W497_HkVTVFG2Cc8AclM8guZDRPbAq7lmRFWrx3VFD51mlOdCm8DJF9IEzxQG7XGhEctsFbAktyKX9I"/>
+</div>
+<div class="absolute bottom-4 right-4 flex flex-col gap-2">
+<button class="w-6 h-6 border border-white/20 flex items-center justify-center text-white/50 hover:text-white"><span class="material-icons-outlined text-xs">fullscreen</span></button>
+<button class="w-6 h-6 border border-white/20 flex items-center justify-center text-white/50 hover:text-white"><span class="material-icons-outlined text-xs">open_in_new</span></button>
+</div>
+</div>
+</div>
+</div>
+<div class="col-span-3 flex flex-col gap-6">
+<div class="h-1/2 bg-white/40 dark:bg-zinc-900/40 border border-sandstone-300 dark:border-sandstone-700 p-5 flex flex-col">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="technical-text opacity-60 font-bold">Bottom Hole Pressure</h3>
+<p class="text-xs">Sensor ID: BH-ALB-04</p>
+</div>
+<span class="material-icons-outlined text-primary">sensors</span>
+</div>
+<div class="flex-1 flex flex-col justify-center">
+<div class="flex items-baseline gap-2 mb-8">
+<span class="text-5xl font-light tracking-tight">4,128</span>
+<span class="text-xs opacity-50 uppercase">psia</span>
+</div>
+<div class="flex items-end gap-1 h-12">
+<div class="flex-1 bg-sandstone-300 dark:bg-sandstone-700 h-[60%]"></div>
+<div class="flex-1 bg-sandstone-300 dark:bg-sandstone-700 h-[75%]"></div>
+<div class="flex-1 bg-sandstone-300 dark:bg-sandstone-700 h-[55%]"></div>
+<div class="flex-1 bg-primary h-[90%]"></div>
+<div class="flex-1 bg-sandstone-300 dark:bg-sandstone-700 h-[45%]"></div>
+<div class="flex-1 bg-sandstone-300 dark:bg-sandstone-700 h-[40%]"></div>
+<div class="flex-1 bg-sandstone-300 dark:bg-sandstone-700 h-[30%]"></div>
+</div>
+</div>
+</div>
+<div class="h-1/2 bg-white/20 dark:bg-zinc-900/20 border border-dashed border-sandstone-400 dark:border-sandstone-600 flex items-center justify-center text-center p-8 group cursor-pointer hover:bg-white/40 transition-all">
+<div class="flex flex-col items-center gap-3 opacity-40 group-hover:opacity-100 transition-opacity">
+<span class="material-icons-outlined text-3xl">add_chart</span>
+<p class="technical-text font-bold">Append Correlation Matrix</p>
+</div>
+</div>
+</div>
+</div>
+<footer class="h-10 border-t border-sandstone-300 dark:border-sandstone-700 flex items-center justify-between px-6 bg-white dark:bg-zinc-950">
+<div class="flex items-center gap-6 technical-text opacity-60">
+<span class="flex items-center gap-1">COORD: 01°22'N / 30°33'E</span>
+<span class="flex items-center gap-1">COMPUTE: AGENTIC_SYNTH_04_OK</span>
+</div>
+<div class="flex items-center gap-6 technical-text">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<span>Engine Active</span>
+</div>
+<span class="opacity-60">Latency: 12ms</span>
+</div>
+</footer>
+</main>
+<script>
+        // Toggle dark mode function for testing/demonstration
+        // document.documentElement.classList.toggle('dark');
+    </script>
+
+</body></html>

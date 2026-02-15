@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cysmic Subsurface Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "sandstone-50": "#F9F7F5",
+                        "sandstone-100": "#EBE8E4",
+                        "sandstone-200": "#DCD7D1",
+                        "sandstone-300": "#CDC4BC",
+                        "sandstone-400": "#BDB2A8",
+                        "sandstone-600": "#8C8074",
+                        "sandstone-800": "#5D534A",
+                        "slate-700": "#374151",
+                        "slate-800": "#2C3E50",
+                        "slate-900": "#1F2937",
+                        "clay": "#A0522D",
+                        "tech-orange": "#E65100",
+                        "strata-grey": "#4A4A4A",
+                        "geo-dark": "#1a1816",
+                        "field-green": "#4F6F52",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "mono": ["IBM Plex Mono", "monospace"]
+                    },
+                    backgroundImage: {
+                        'grid-pattern': "linear-gradient(to right, #DCD7D1 1px, transparent 1px), linear-gradient(to bottom, #DCD7D1 1px, transparent 1px)",
+                        'rock-texture': "url('https://www.transparenttextures.com/patterns/concrete-wall.png')",
+                    },
+                    boxShadow: {
+                        'matte': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+                        'matte-lg': '0 4px 6px -1px rgba(0, 0, 0, 0.15), 0 2px 4px -1px rgba(0, 0, 0, 0.1)',
+                        'inset-panel': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
+                        'rugged': '2px 2px 0 0 #BDB2A8, 0 4px 6px rgba(0,0,0,0.05)',
+                        'rugged-hover': '3px 3px 0 0 #A0522D, 0 6px 8px rgba(0,0,0,0.1)',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #EBE8E4; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #8C8074; 
+            border-radius: 0px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #A0522D; 
+        }
+        .matte-panel {
+            background: rgba(235, 232, 228, 0.90);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid #BDB2A8;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .bg-tech-grid {
+            background-size: 40px 40px;
+            background-image: linear-gradient(to right, rgba(93, 83, 74, 0.08) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(93, 83, 74, 0.08) 1px, transparent 1px);
+        }
+        .rugged-card {
+            background: #F9F7F5;
+            border: 1px solid #BDB2A8;
+            transition: all 0.2s ease-out;
+        }
+        .rugged-card:hover {
+            transform: translateY(-2px);
+            border-color: #A0522D;
+            box-shadow: 3px 3px 0 0 #A0522D, 0 6px 8px rgba(0,0,0,0.1);
+        }
+        .cysmic-logo-c {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .cysmic-logo-c::before {
+            content: '';
+            position: absolute;
+            width: 70%;
+            height: 70%;
+            border: 3px solid #F9F7F5;
+            border-right-color: transparent;
+            border-radius: 50%;
+            transform: rotate(-45deg);
+        }
+        .cysmic-logo-c::after {
+            content: '';
+            position: absolute;
+            width: 40%;
+            height: 40%;
+            border: 2px solid #A0522D;
+            border-right-color: transparent;
+            border-radius: 50%;
+            transform: rotate(-45deg);
+        }
+        .topo-lines {
+            background-image: repeating-radial-gradient(#8C8074 0 1px, transparent 1px 10px);
+            opacity: 0.1;
+        }
+    </style>
+</head>
+<body class="bg-sandstone-100 font-display text-slate-900 overflow-hidden h-screen w-screen relative selection:bg-clay selection:text-white flex">
+<aside class="w-72 h-full flex flex-col z-50 bg-sandstone-100/95 backdrop-blur-xl border-r border-sandstone-300 shadow-2xl shrink-0">
+<div class="p-5 border-b border-sandstone-300 bg-sandstone-200/50">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-sm bg-sandstone-800 shadow-md border border-sandstone-600 relative overflow-hidden shrink-0">
+<div class="cysmic-logo-c"></div>
+</div>
+<div>
+<h1 class="font-bold text-lg tracking-tight text-slate-900 leading-none">CYSMIC</h1>
+<p class="text-[10px] text-clay font-mono font-bold tracking-widest uppercase mt-1">African Ops</p>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto py-4 px-3 space-y-6">
+<div>
+<h2 class="px-2 text-[10px] uppercase tracking-widest text-sandstone-600 font-bold mb-3 border-b border-sandstone-200 pb-1">African Fields</h2>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-sm bg-white border border-sandstone-300 shadow-sm text-slate-800 font-medium text-sm group" href="#">
+<span class="material-symbols-outlined text-clay text-lg font-light">grid_view</span>
+<span>Overview</span>
+<span class="ml-auto w-1.5 h-1.5 rounded-full bg-clay"></span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-sm hover:bg-sandstone-200 text-slate-700 hover:text-slate-900 transition-colors text-sm border border-transparent hover:border-sandstone-300" href="#">
+<span class="material-symbols-outlined text-sandstone-500 text-lg font-light">location_on</span>
+<span>Lake Albert B</span>
+<span class="ml-auto flex items-center gap-1 text-[9px] bg-green-100 text-green-800 px-1.5 py-0.5 rounded-sm font-mono border border-green-200 opacity-60">
+                            LIVE
+                        </span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-sm hover:bg-sandstone-200 text-slate-700 hover:text-slate-900 transition-colors text-sm border border-transparent hover:border-sandstone-300" href="#">
+<span class="material-symbols-outlined text-sandstone-500 text-lg font-light">water_drop</span>
+<span>Niger Delta North</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-sm hover:bg-sandstone-200 text-slate-700 hover:text-slate-900 transition-colors text-sm border border-transparent hover:border-sandstone-300" href="#">
+<span class="material-symbols-outlined text-sandstone-500 text-lg font-light">landscape</span>
+<span>Kwanza Basin</span>
+</a>
+</nav>
+</div>
+<div>
+<h2 class="px-2 text-[10px] uppercase tracking-widest text-sandstone-600 font-bold mb-3 border-b border-sandstone-200 pb-1">Assets</h2>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-sm hover:bg-sandstone-200 text-slate-700 hover:text-slate-900 transition-colors text-sm" href="#">
+<span class="material-symbols-outlined text-sandstone-500 text-lg font-light">precision_manufacturing</span>
+<span>Rig Operations</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-sm hover:bg-sandstone-200 text-slate-700 hover:text-slate-900 transition-colors text-sm" href="#">
+<span class="material-symbols-outlined text-sandstone-500 text-lg font-light">sensors</span>
+<span>IoT Sensor Grid</span>
+</a>
+</nav>
+</div>
+</div>
+<div class="px-3 pb-4">
+<div class="px-2 flex justify-between items-center mb-2 border-b border-sandstone-200 pb-1">
+<h2 class="text-[10px] uppercase tracking-widest text-sandstone-600 font-bold">Live Feed</h2>
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+</span>
+</div>
+<div class="bg-sandstone-50 border border-sandstone-300 rounded-sm p-3 space-y-3 shadow-inner">
+<div class="flex items-start gap-2 pb-2 border-b border-sandstone-200 border-dashed">
+<span class="material-symbols-outlined text-yellow-600 text-sm mt-0.5 font-light">warning</span>
+<div class="min-w-0 flex-1">
+<div class="flex justify-between w-full">
+<span class="font-bold text-xs text-slate-800 truncate">Pump 4 Overheat</span>
+</div>
+<p class="text-[10px] text-slate-500 leading-tight mt-0.5">Temp &gt; 185°F. Throttled to 60%.</p>
+<span class="text-[9px] text-slate-400 font-mono block mt-1">2m ago</span>
+</div>
+</div>
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-green-600 text-sm mt-0.5 font-light">check_circle</span>
+<div class="min-w-0 flex-1">
+<div class="flex justify-between w-full">
+<span class="font-bold text-xs text-slate-800 truncate">Drilling Phase 2</span>
+</div>
+<p class="text-[10px] text-slate-500 leading-tight mt-0.5">Depth: 4500ft. Casing init.</p>
+<span class="text-[9px] text-slate-400 font-mono block mt-1">15m ago</span>
+</div>
+</div>
+</div>
+</div>
+<div class="p-4 border-t border-sandstone-300 bg-sandstone-200/50 mt-auto">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-sm bg-sandstone-300 border border-sandstone-400 flex items-center justify-center text-slate-700 font-bold text-xs shadow-sm">JD</div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-medium text-slate-900 truncate">J. Doe</p>
+<p class="text-[10px] text-slate-500 truncate font-mono uppercase">Lead Engineer</p>
+</div>
+<button class="text-slate-500 hover:text-slate-800 transition-colors">
+<span class="material-symbols-outlined text-lg font-light">settings</span>
+</button>
+</div>
+</div>
+</aside>
+<main class="flex-1 h-full relative flex flex-col bg-sandstone-50 bg-tech-grid overflow-hidden">
+<div class="px-8 py-6 flex justify-between items-end border-b border-sandstone-200 bg-white/40 backdrop-blur-sm z-10">
+<div>
+<h2 class="text-2xl font-bold text-slate-800 tracking-tight">Regional Overview</h2>
+<div class="flex items-center gap-2 mt-1">
+<span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+<p class="text-xs text-slate-500 font-mono uppercase tracking-wider">System Status: Nominal • 3 Fields Active</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="px-3 py-1.5 bg-white border border-sandstone-300 rounded-sm text-xs font-mono text-slate-600 shadow-sm hover:border-clay hover:text-clay transition-colors">
+                    EXPORT REPORT
+                </button>
+<button class="px-3 py-1.5 bg-sandstone-800 text-sandstone-50 border border-sandstone-900 rounded-sm text-xs font-mono shadow-sm hover:bg-slate-800 transition-colors">
+                    ADD FIELD
+                </button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-8 relative z-0">
+<div class="absolute inset-0 pointer-events-none opacity-5 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] z-[-1]"></div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-24">
+<div class="rugged-card p-0 shadow-rugged relative overflow-hidden group">
+<div class="h-32 bg-sandstone-200 relative overflow-hidden border-b border-sandstone-300">
+<div class="absolute inset-0 topo-lines mix-blend-multiply"></div>
+<img alt="Lake Albert Topology" class="w-full h-full object-cover mix-blend-overlay opacity-60 grayscale contrast-125" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqVneojtJt1D9bbI0AENLaUYDEmhdIzMonrGKgv8FA6GtuarYDREjJ8PoXfwRZMqtazTNIvBxyPyzXsUNhgeXV_Q70K_l8N3h-2LmQxmv8izZ3hzvlTqeVZlMColERI6rOlspROHd98AKYN85gBqzYfoDKqNHMAnGuY9W8zaXWUW1z7nmrCl88W0xBMY-GIdWJPdxzsieKI2Q-MqkWpAyCvOFwsZHaDn3mg0nBz1HbrblltbHx45rq7tJQ_gg5XpGlesDCpXRZ-Ls"/>
+<div class="absolute top-3 left-3 bg-white/90 backdrop-blur px-2 py-1 rounded-sm border border-sandstone-300 shadow-sm z-10">
+<span class="text-[10px] font-bold text-slate-800 uppercase tracking-widest">Lake Albert B</span>
+</div>
+<div class="absolute bottom-2 right-2 flex gap-1">
+<span class="w-1.5 h-1.5 bg-green-500 rounded-full shadow-sm ring-1 ring-white"></span>
+<span class="w-1.5 h-1.5 bg-green-500 rounded-full shadow-sm ring-1 ring-white"></span>
+<span class="w-1.5 h-1.5 bg-sandstone-400 rounded-full shadow-sm ring-1 ring-white"></span>
+</div>
+</div>
+<div class="p-5">
+<div class="grid grid-cols-2 gap-4 mb-4">
+<div>
+<p class="text-[10px] uppercase text-slate-500 font-bold mb-1">Daily Prod</p>
+<div class="text-xl font-mono font-medium text-slate-800">24.5k <span class="text-xs text-slate-400">bbl</span></div>
+</div>
+<div>
+<p class="text-[10px] uppercase text-slate-500 font-bold mb-1">Active Rigs</p>
+<div class="text-xl font-mono font-medium text-slate-800">08 <span class="text-xs text-slate-400">units</span></div>
+</div>
+</div>
+<div class="bg-sandstone-100/50 rounded p-2 border border-sandstone-200 mb-4">
+<div class="flex justify-between items-center mb-1">
+<span class="text-[10px] font-bold text-clay uppercase">AI Reserve Pred.</span>
+<span class="material-symbols-outlined text-clay text-sm">auto_graph</span>
+</div>
+<div class="text-sm font-mono text-slate-700">1.2B bbl <span class="text-green-600 text-[10px] ml-1">▲ 2.4%</span></div>
+<div class="w-full bg-sandstone-300 h-1 mt-2 rounded-full overflow-hidden">
+<div class="bg-clay h-full w-[75%]"></div>
+</div>
+</div>
+<div class="flex justify-between items-center pt-2 border-t border-sandstone-200">
+<span class="text-[10px] text-slate-400 font-mono">Last updated: 10m ago</span>
+<button class="text-clay hover:text-tech-orange text-xs font-bold uppercase flex items-center gap-1 transition-colors">
+                                Details <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<div class="rugged-card p-0 shadow-rugged relative overflow-hidden group">
+<div class="h-32 bg-sandstone-300 relative overflow-hidden border-b border-sandstone-300">
+<div class="absolute inset-0 topo-lines mix-blend-multiply" style="transform: rotate(90deg)"></div>
+<img alt="Niger Delta Topology" class="w-full h-full object-cover mix-blend-soft-light opacity-50 grayscale contrast-125" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmLO6vSXtVnnAZsd2IG-_72PvkZstAZHMWMshVKY-lYu7Gm9uzWQP8fZAM3vfbavoRzBcvm20lLymDvtY_4PZOib3fDU7CljcP43JkSDAmkSTUqnuVL6vURYjZvB6Us1Q7ZP0Crv-fhcvdjsPzg7Lco4jdcpkbtOuS02gSFlMSaaMi9FJMCNLVhmMXi20QUvlESvIO0D8pG_t6Pq6R4r-5bIM0IPk1o0rKHupgz5JB5p6EWnuRW9x03tdz6YvZs4PyBDti12jxhKk"/>
+<div class="absolute top-3 left-3 bg-white/90 backdrop-blur px-2 py-1 rounded-sm border border-sandstone-300 shadow-sm z-10">
+<span class="text-[10px] font-bold text-slate-800 uppercase tracking-widest">Niger Delta N.</span>
+</div>
+<div class="absolute bottom-2 right-2 flex gap-1">
+<span class="w-1.5 h-1.5 bg-green-500 rounded-full shadow-sm ring-1 ring-white"></span>
+<span class="w-1.5 h-1.5 bg-green-500 rounded-full shadow-sm ring-1 ring-white"></span>
+<span class="w-1.5 h-1.5 bg-green-500 rounded-full shadow-sm ring-1 ring-white"></span>
+<span class="w-1.5 h-1.5 bg-tech-orange rounded-full shadow-sm ring-1 ring-white animate-pulse"></span>
+</div>
+</div>
+<div class="p-5">
+<div class="grid grid-cols-2 gap-4 mb-4">
+<div>
+<p class="text-[10px] uppercase text-slate-500 font-bold mb-1">Daily Prod</p>
+<div class="text-xl font-mono font-medium text-slate-800">42.1k <span class="text-xs text-slate-400">bbl</span></div>
+</div>
+<div>
+<p class="text-[10px] uppercase text-slate-500 font-bold mb-1">Active Rigs</p>
+<div class="text-xl font-mono font-medium text-slate-800">12 <span class="text-xs text-slate-400">units</span></div>
+</div>
+</div>
+<div class="bg-sandstone-100/50 rounded p-2 border border-sandstone-200 mb-4">
+<div class="flex justify-between items-center mb-1">
+<span class="text-[10px] font-bold text-clay uppercase">AI Reserve Pred.</span>
+<span class="material-symbols-outlined text-clay text-sm">auto_graph</span>
+</div>
+<div class="text-sm font-mono text-slate-700">3.8B bbl <span class="text-slate-400 text-[10px] ml-1">― 0.0%</span></div>
+<div class="w-full bg-sandstone-300 h-1 mt-2 rounded-full overflow-hidden">
+<div class="bg-clay h-full w-[90%]"></div>
+</div>
+</div>
+<div class="flex justify-between items-center pt-2 border-t border-sandstone-200">
+<span class="text-[10px] text-slate-400 font-mono">Last updated: 2m ago</span>
+<button class="text-clay hover:text-tech-orange text-xs font-bold uppercase flex items-center gap-1 transition-colors">
+                                Details <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<div class="rugged-card p-0 shadow-rugged relative overflow-hidden group">
+<div class="h-32 bg-slate-200 relative overflow-hidden border-b border-sandstone-300">
+<div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/concrete-wall.png')] opacity-30"></div>
+<div class="absolute top-3 left-3 bg-white/90 backdrop-blur px-2 py-1 rounded-sm border border-sandstone-300 shadow-sm z-10">
+<span class="text-[10px] font-bold text-slate-800 uppercase tracking-widest">Kwanza Basin</span>
+</div>
+<div class="absolute bottom-2 right-2 flex gap-1">
+<span class="w-1.5 h-1.5 bg-yellow-500 rounded-full shadow-sm ring-1 ring-white"></span>
+<span class="w-1.5 h-1.5 bg-sandstone-400 rounded-full shadow-sm ring-1 ring-white"></span>
+</div>
+</div>
+<div class="p-5">
+<div class="grid grid-cols-2 gap-4 mb-4">
+<div>
+<p class="text-[10px] uppercase text-slate-500 font-bold mb-1">Daily Prod</p>
+<div class="text-xl font-mono font-medium text-slate-800">18.2k <span class="text-xs text-slate-400">bbl</span></div>
+</div>
+<div>
+<p class="text-[10px] uppercase text-slate-500 font-bold mb-1">Active Rigs</p>
+<div class="text-xl font-mono font-medium text-slate-800">04 <span class="text-xs text-slate-400">units</span></div>
+</div>
+</div>
+<div class="bg-sandstone-100/50 rounded p-2 border border-sandstone-200 mb-4">
+<div class="flex justify-between items-center mb-1">
+<span class="text-[10px] font-bold text-clay uppercase">AI Reserve Pred.</span>
+<span class="material-symbols-outlined text-clay text-sm">auto_graph</span>
+</div>
+<div class="text-sm font-mono text-slate-700">0.9B bbl <span class="text-red-500 text-[10px] ml-1">▼ 1.1%</span></div>
+<div class="w-full bg-sandstone-300 h-1 mt-2 rounded-full overflow-hidden">
+<div class="bg-clay h-full w-[45%]"></div>
+</div>
+</div>
+<div class="flex justify-between items-center pt-2 border-t border-sandstone-200">
+<span class="text-[10px] text-slate-400 font-mono">Last updated: 1h ago</span>
+<button class="text-clay hover:text-tech-orange text-xs font-bold uppercase flex items-center gap-1 transition-colors">
+                                Details <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<div class="border-2 border-dashed border-sandstone-300 rounded-sm p-6 flex flex-col items-center justify-center text-center gap-3 hover:border-clay hover:bg-sandstone-100/50 transition-colors cursor-pointer group h-full min-h-[300px]">
+<div class="w-12 h-12 rounded-full bg-sandstone-200 flex items-center justify-center group-hover:bg-white group-hover:shadow-sm transition-all">
+<span class="material-symbols-outlined text-sandstone-500 group-hover:text-clay text-2xl">add_location_alt</span>
+</div>
+<div>
+<h3 class="text-sm font-bold text-slate-700">Initialize New Field</h3>
+<p class="text-xs text-slate-500 mt-1 max-w-[150px] mx-auto">Connect new data sources or manually input survey data</p>
+</div>
+</div>
+</div>
+</div>
+<div class="h-28 bg-white border-t border-sandstone-300 relative z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+<div class="absolute top-0 left-0 px-2 py-1 bg-sandstone-800 text-sandstone-50 text-[10px] font-mono uppercase tracking-widest rounded-br-sm shadow-sm">
+                Global Operations Timeline
+            </div>
+<div class="h-full flex flex-col p-4 pt-6 overflow-x-auto">
+<div class="flex justify-between text-[10px] font-mono text-slate-400 mb-2 px-8">
+<span>Q1 Jan</span>
+<span>Feb</span>
+<span>Mar</span>
+<span>Q2 Apr</span>
+<span>May</span>
+<span>Jun</span>
+<span>Q3 Jul</span>
+<span>Aug</span>
+<span>Sep</span>
+<span>Q4 Oct</span>
+<span>Nov</span>
+<span>Dec</span>
+</div>
+<div class="relative h-12 flex-1 mx-8">
+<div class="absolute inset-0 flex justify-between pointer-events-none">
+<div class="w-px h-full bg-sandstone-100"></div>
+<div class="w-px h-full bg-sandstone-100"></div>
+<div class="w-px h-full bg-sandstone-100"></div>
+<div class="w-px h-full bg-sandstone-100"></div>
+<div class="w-px h-full bg-sandstone-100"></div>
+<div class="w-px h-full bg-sandstone-100"></div>
+<div class="w-px h-full bg-sandstone-100"></div>
+<div class="w-px h-full bg-sandstone-100"></div>
+<div class="w-px h-full bg-sandstone-100"></div>
+<div class="w-px h-full bg-sandstone-100"></div>
+<div class="w-px h-full bg-sandstone-100"></div>
+<div class="w-px h-full bg-sandstone-100"></div>
+</div>
+<div class="absolute top-1 left-[10%] w-[30%] h-2 bg-sandstone-200 rounded-full overflow-hidden">
+<div class="w-full h-full bg-[url('https://www.transparenttextures.com/patterns/diagonal-stripes.png')] opacity-30"></div>
+</div>
+<div class="absolute top-1 left-[50%] w-[20%] h-2 bg-sandstone-200 rounded-full overflow-hidden">
+<div class="w-full h-full bg-[url('https://www.transparenttextures.com/patterns/diagonal-stripes.png')] opacity-30"></div>
+</div>
+<div class="absolute top-4 left-[10%] w-[18%] h-3 bg-clay rounded-sm shadow-sm flex items-center group cursor-help">
+<span class="text-[8px] text-white pl-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Drilling Phase 1</span>
+</div>
+<div class="absolute top-4 left-[35%] w-[10%] h-3 bg-tech-orange rounded-sm shadow-sm flex items-center group cursor-help">
+<span class="text-[8px] text-white pl-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Maint.</span>
+</div>
+<div class="absolute top-4 left-[60%] w-[25%] h-3 bg-field-green rounded-sm shadow-sm flex items-center group cursor-help opacity-50 border border-green-700 border-dashed bg-transparent">
+<span class="text-[8px] text-green-800 pl-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Projection</span>
+</div>
+<div class="absolute top-[-5px] bottom-0 left-[28%] w-px bg-red-500 z-10">
+<div class="absolute -top-1 -left-[3px] w-2 h-2 rounded-full bg-red-500"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="absolute bottom-32 inset-x-0 flex justify-center pointer-events-none z-50">
+<div class="w-full max-w-2xl mx-4 pointer-events-auto">
+<div class="relative group">
+<div class="bg-sandstone-50/90 backdrop-blur-md rounded-lg shadow-xl border border-sandstone-300 flex items-center p-1.5 pl-4 transition-all duration-300 ring-1 ring-black/5 focus-within:ring-clay focus-within:ring-2 focus-within:bg-white">
+<span class="material-symbols-outlined text-clay mr-3 text-2xl animate-pulse" style="font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;">diamond</span>
+<input class="w-full bg-transparent border-none focus:ring-0 text-slate-800 placeholder-slate-400 text-base h-10 font-medium font-mono" placeholder="Query field data or ask Cysmic..." type="text"/>
+<div class="hidden sm:flex items-center gap-1 mr-2 px-2 py-1 bg-sandstone-200 rounded text-sandstone-600 border border-sandstone-300">
+<span class="text-[10px] font-bold font-mono">⌘ K</span>
+</div>
+<button class="bg-sandstone-800 hover:bg-slate-800 text-white rounded p-2 transition-colors shadow-sm">
+<span class="material-symbols-outlined text-lg font-light">arrow_forward</span>
+</button>
+</div>
+<div class="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-lg shadow-2xl border border-sandstone-200 overflow-hidden opacity-0 group-focus-within:opacity-100 pointer-events-none group-focus-within:pointer-events-auto transition-all transform origin-bottom scale-95 group-focus-within:scale-100 z-50">
+<div class="p-2">
+<div class="px-3 py-2 text-[10px] uppercase text-slate-400 font-bold tracking-wider border-b border-sandstone-100 mb-1">Suggested</div>
+<button class="w-full text-left px-3 py-2 hover:bg-sandstone-50 rounded flex items-center gap-3 text-sm text-slate-700 group/item">
+<span class="material-symbols-outlined text-slate-400 group-hover/item:text-clay text-sm font-light">history</span>
+                                Compare reserves: Lake Albert vs Niger Delta
+                            </button>
+<button class="w-full text-left px-3 py-2 hover:bg-sandstone-50 rounded flex items-center gap-3 text-sm text-slate-700 group/item">
+<span class="material-symbols-outlined text-slate-400 group-hover/item:text-clay text-sm font-light">history</span>
+                                Forecast production decline Q3
+                            </button>
+</div>
+<div class="bg-sandstone-50 p-2 border-t border-sandstone-200 flex justify-between items-center">
+<span class="text-xs text-slate-500 px-2 font-mono">Cysmic Agent v3.1 Active</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+</body></html>

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Well Operations | Log &amp; Completion Design</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#A34E2E", // Deep Terracotta
+                        "background-light": "#F2F1ED", // Sandstone Light
+                        "background-dark": "#121210", // Dark Obsidian
+                        "sandstone-100": "#E9E7E1",
+                        "sandstone-200": "#DCD9D1",
+                        "sandstone-300": "#C4C0B4",
+                        "sandstone-700": "#4A4741",
+                        "shale": "#5A5E63",
+                    },
+                    fontFamily: {
+                        display: ["JetBrains Mono", "monospace"],
+                        sans: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "2px",
+                    },
+                },
+            },
+        };
+    </script>
+<style type="text/tailwindcss">
+        .grid-bg {
+            background-image: 
+                linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        .dark .grid-bg {
+            background-image: 
+                linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+        }
+        body { font-family: 'JetBrains Mono', monospace; }
+        .technical-text { font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; }
+        .scrolling-content::-webkit-scrollbar { width: 4px; }
+        .scrolling-content::-webkit-scrollbar-thumb { background: #C4C0B4; }
+        .lith-sandstone {
+            background-image: radial-gradient(#d4a373 0.5px, transparent 0.5px);
+            background-size: 4px 4px;
+            background-color: #e9e7e1;
+        }
+        .lith-shale {
+            background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, #4a4741 2px, #4a4741 3px);
+            background-color: #5a5e63;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 min-h-screen flex overflow-hidden">
+<aside class="w-16 border-r border-sandstone-300 dark:border-sandstone-700 flex flex-col items-center py-6 bg-sandstone-100 dark:bg-zinc-900 z-10">
+<div class="mb-8 p-2 bg-sandstone-700 text-white rounded">
+<span class="material-symbols-outlined">terrain</span>
+</div>
+<nav class="flex flex-col gap-6 text-slate-500">
+<button class="hover:text-primary transition-colors"><span class="material-symbols-outlined">grid_view</span></button>
+<button class="hover:text-primary transition-colors"><span class="material-symbols-outlined">analytics</span></button>
+<button class="text-primary"><span class="material-symbols-outlined">architecture</span></button>
+<button class="hover:text-primary transition-colors"><span class="material-symbols-outlined">layers</span></button>
+</nav>
+<div class="mt-auto flex flex-col gap-6 items-center">
+<button class="text-slate-500 hover:text-primary"><span class="material-symbols-outlined">settings</span></button>
+<div class="w-8 h-8 rounded-full bg-sandstone-300 dark:bg-sandstone-700 flex items-center justify-center text-xs font-bold">JD</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col relative overflow-hidden grid-bg">
+<header class="h-14 border-b border-sandstone-300 dark:border-sandstone-700 flex items-center justify-between px-6 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm">
+<div class="flex items-center gap-4">
+<h1 class="font-bold tracking-tight text-sm uppercase">Well Operations</h1>
+<span class="text-sandstone-300 dark:text-sandstone-700">|</span>
+<div class="flex items-center gap-2 technical-text opacity-70">
+<span class="material-symbols-outlined text-primary text-sm">location_on</span>
+<span>Lake Albert B // Well AL-104</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-4 py-1.5 border border-sandstone-300 dark:border-sandstone-700 text-[10px] font-bold hover:bg-sandstone-100 dark:hover:bg-zinc-800 transition-all uppercase tracking-wider">Download Logs</button>
+<button class="px-4 py-1.5 bg-sandstone-700 dark:bg-stone-300 text-white dark:text-black text-[10px] font-bold hover:opacity-90 transition-all uppercase tracking-wider">Ops Approval</button>
+</div>
+</header>
+<div class="flex-1 grid grid-cols-12 gap-6 p-6 overflow-hidden">
+<div class="col-span-4 flex flex-col bg-white/40 dark:bg-zinc-900/40 border border-sandstone-300 dark:border-sandstone-700 overflow-hidden">
+<div class="p-4 border-b border-sandstone-300 dark:border-sandstone-700 flex justify-between items-center bg-sandstone-100/50 dark:bg-zinc-800/50">
+<h3 class="technical-text font-bold">Well Logs</h3>
+<span class="text-[10px] opacity-60">DEPTH: 2,450m TVD</span>
+</div>
+<div class="flex-1 flex overflow-hidden">
+<div class="w-12 border-r border-sandstone-300 dark:border-sandstone-700 flex flex-col text-[8px] text-center pt-4 gap-16 opacity-50">
+<span>2400</span><span>2420</span><span>2440</span><span>2460</span><span>2480</span><span>2500</span>
+</div>
+<div class="flex-1 border-r border-sandstone-300 dark:border-sandstone-700 relative bg-white/20">
+<div class="absolute inset-0 flex flex-col">
+<div class="h-24 lith-sandstone opacity-20"></div>
+<div class="h-12 lith-shale"></div>
+<div class="h-32 lith-sandstone opacity-40"></div>
+<div class="h-8 lith-shale"></div>
+</div>
+<svg class="absolute inset-0 h-full w-full" preserveAspectRatio="none">
+<polyline fill="none" points="10,0 40,50 15,100 60,150 20,200 45,250 10,300 55,350 30,400 45,450 10,500" stroke="#A34E2E" stroke-width="1"></polyline>
+</svg>
+<div class="absolute top-2 left-2 technical-text text-[8px] font-bold">GR</div>
+</div>
+<div class="flex-1 border-r border-sandstone-300 dark:border-sandstone-700 relative bg-white/20">
+<svg class="absolute inset-0 h-full w-full" preserveAspectRatio="none">
+<polyline fill="none" points="50,0 30,50 80,100 40,150 70,200 30,250 90,300 20,350 60,400 40,450 70,500" stroke="#2e6aa3" stroke-dasharray="2,2" stroke-width="1"></polyline>
+</svg>
+<div class="absolute top-2 left-2 technical-text text-[8px] font-bold">RES</div>
+</div>
+<div class="flex-1 relative bg-white/20">
+<svg class="absolute inset-0 h-full w-full" preserveAspectRatio="none">
+<polyline fill="none" points="30,0 35,50 32,100 38,150 34,200 36,250 31,300 39,350 33,400 37,450 32,500" stroke="#4a4741" stroke-width="1.5"></polyline>
+</svg>
+<div class="absolute top-2 left-2 technical-text text-[8px] font-bold">RHOB</div>
+</div>
+</div>
+</div>
+<div class="col-span-4 flex flex-col gap-6 overflow-hidden">
+<div class="flex-1 bg-white/40 dark:bg-zinc-900/40 border border-sandstone-300 dark:border-sandstone-700 p-5 flex flex-col">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="technical-text opacity-60 font-bold">Casing &amp; Tubing Design</h3>
+<p class="text-xs">API Standard 5CT</p>
+</div>
+<span class="material-symbols-outlined opacity-40">format_align_center</span>
+</div>
+<div class="flex-1 relative flex justify-center">
+<div class="w-48 h-full border-x border-sandstone-300 dark:border-sandstone-700 relative">
+<div class="absolute top-0 left-[-20px] right-[-20px] h-12 border-x-4 border-slate-600 dark:border-slate-400">
+<span class="absolute right-[-45px] top-4 text-[8px] technical-text">30" @ 120m</span>
+</div>
+<div class="absolute top-0 left-[-12px] right-[-12px] h-32 border-x-2 border-slate-500 dark:border-slate-500">
+<span class="absolute right-[-45px] top-24 text-[8px] technical-text">20" @ 450m</span>
+</div>
+<div class="absolute top-0 left-[-4px] right-[-4px] h-64 border-x border-slate-400 dark:border-slate-600">
+<span class="absolute right-[-60px] top-56 text-[8px] technical-text">13 3/8" @ 1200m</span>
+</div>
+<div class="absolute top-0 left-[4px] right-[4px] h-full border-x border-primary/50">
+<span class="absolute right-[-55px] bottom-4 text-[8px] technical-text text-primary">9 5/8" @ TD</span>
+</div>
+</div>
+</div>
+</div>
+<div class="h-1/3 bg-white/40 dark:bg-zinc-900/40 border border-sandstone-300 dark:border-sandstone-700 p-5 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<h3 class="technical-text opacity-60 font-bold">Completion Design</h3>
+<span class="material-symbols-outlined text-primary text-sm">settings_input_component</span>
+</div>
+<div class="flex-1 flex items-center justify-around border-t border-dashed border-sandstone-300 mt-2 pt-4">
+<div class="flex flex-col items-center">
+<div class="w-8 h-12 bg-zinc-800 flex items-center justify-center">
+<div class="w-10 h-2 bg-primary"></div>
+</div>
+<span class="text-[8px] mt-2 text-center uppercase tracking-tighter">Production<br/>Packer</span>
+</div>
+<div class="flex flex-col items-center">
+<div class="w-4 h-16 border-x border-zinc-400 flex flex-col gap-1 justify-center py-2">
+<div class="w-full h-1 bg-primary/40"></div>
+<div class="w-full h-1 bg-primary/40"></div>
+<div class="w-full h-1 bg-primary/40"></div>
+</div>
+<span class="text-[8px] mt-2 text-center uppercase tracking-tighter">Perforated<br/>Interval</span>
+</div>
+</div>
+</div>
+</div>
+<div class="col-span-4 flex flex-col gap-6">
+<div class="flex-1 bg-white/40 dark:bg-zinc-900/40 border border-sandstone-300 dark:border-sandstone-700 p-5 flex flex-col">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="technical-text opacity-60 font-bold">Live Drilling Telemetry</h3>
+<p class="text-xs text-green-600">STREAMING: ACTIVE</p>
+</div>
+<span class="material-symbols-outlined text-primary">dynamic_feed</span>
+</div>
+<div class="space-y-6">
+<div class="space-y-1">
+<div class="flex justify-between technical-text text-[9px]">
+<span>ROP (Rate of Penetration)</span>
+<span class="font-bold text-primary">24.5 m/hr</span>
+</div>
+<div class="h-2 bg-sandstone-200 dark:bg-zinc-800">
+<div class="h-full bg-primary" style="width: 65%;"></div>
+</div>
+</div>
+<div class="space-y-1">
+<div class="flex justify-between technical-text text-[9px]">
+<span>WOB (Weight on Bit)</span>
+<span class="font-bold">12.2 klbs</span>
+</div>
+<div class="h-2 bg-sandstone-200 dark:bg-zinc-800">
+<div class="h-full bg-sandstone-700" style="width: 40%;"></div>
+</div>
+</div>
+<div class="space-y-1">
+<div class="flex justify-between technical-text text-[9px]">
+<span>Torque</span>
+<span class="font-bold">18.4 kft-lb</span>
+</div>
+<div class="h-2 bg-sandstone-200 dark:bg-zinc-800">
+<div class="h-full bg-sandstone-700" style="width: 55%;"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="flex-1 bg-zinc-900 text-sandstone-100 border border-sandstone-700 p-5 flex flex-col overflow-hidden">
+<div class="flex items-center gap-2 mb-4">
+<div class="w-5 h-5 bg-primary flex items-center justify-center rounded-sm">
+<span class="material-symbols-outlined text-[14px] text-white">smart_toy</span>
+</div>
+<h3 class="technical-text font-bold text-primary">Agentic Ops Log</h3>
+</div>
+<div class="flex-1 overflow-y-auto scrolling-content space-y-4 pr-2">
+<div class="border-l-2 border-primary/40 pl-3">
+<p class="text-[11px] opacity-60 mb-1">14:22:05 UTC</p>
+<p class="text-xs leading-relaxed">Analyzing hole cleaning efficiency... ECD (Equivalent Circulating Density) within safe margins at 1.14 sg. No significant cuttings accumulation detected.</p>
+</div>
+<div class="border-l-2 border-sandstone-700 pl-3 opacity-80">
+<p class="text-[11px] opacity-60 mb-1">14:15:30 UTC</p>
+<p class="text-xs leading-relaxed">Slight increase in pickup drag noted (5 klbs above baseline). Monitoring torque fluctuations for potential differential sticking risk.</p>
+</div>
+<div class="border-l-2 border-green-600/40 pl-3">
+<p class="text-[11px] opacity-60 mb-1">14:02:11 UTC</p>
+<p class="text-xs leading-relaxed">Formation transition confirmed: Entering Lower Sandstone Unit B. Adjusting WOB recommendation to 15 klbs for optimized ROP.</p>
+</div>
+</div>
+<div class="mt-4 pt-3 border-t border-sandstone-700 flex items-center justify-between">
+<span class="text-[9px] uppercase font-bold text-primary animate-pulse">AI monitoring active</span>
+<span class="material-symbols-outlined text-sm opacity-50">more_horiz</span>
+</div>
+</div>
+</div>
+</div>
+<footer class="h-10 border-t border-sandstone-300 dark:border-sandstone-700 flex items-center justify-between px-6 bg-white dark:bg-zinc-950">
+<div class="flex items-center gap-6 technical-text opacity-60">
+<span class="flex items-center gap-1">COORD: 01°22'N / 30°33'E</span>
+<span class="flex items-center gap-1">COMPUTE: OPS_SYNTH_02_OK</span>
+</div>
+<div class="flex items-center gap-6 technical-text">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<span>Monitoring Active</span>
+</div>
+<span class="opacity-60">Latency: 18ms</span>
+</div>
+</footer>
+</main>
+
+</body></html>
