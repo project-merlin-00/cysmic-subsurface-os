@@ -3,7 +3,8 @@ Core models for CYSMIC Subsurface OS
 """
 
 from django.db import models
-from django.contrib.gis.db import models as gis_models
+# Use regular models - GIS requires GDAL which may not be installed
+# from django.contrib.gis.db import models as gis_models
 
 
 class Field(models.Model):
@@ -11,7 +12,8 @@ class Field(models.Model):
     name = models.CharField(max_length=200)
     basin = models.CharField(max_length=200)
     country = models.CharField(max_length=100, default='Kenya')
-    location = gis_models.PointField(null=True, blank=True)
+    latitude = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True)
     operator = models.CharField(max_length=200, blank=True)
     discovered = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
