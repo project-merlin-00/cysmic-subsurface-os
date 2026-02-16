@@ -1,0 +1,744 @@
+openapi: 3.0.3
+info:
+  title: CYSMIC Subsurface OS API
+  description: |
+    Agent-first petroleum engineering platform API. 
+    Provides endpoints for well management, file ingestion, 
+    analysis (DCA, Volumetrics, Well Testing, Material Balance), 
+    and AI agent interaction.
+  version: 1.0.0
+  contact:
+    name: CYSMIC Team
+    url: https://github.com/project-merlin-00/cysmic-subsurface-os
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Development server
+  - url: https://api.cysmic.io/api/v1
+    description: Production server
+
+security:
+  - BearerAuth: []
+  - APIKeyAuth: []
+
+tags:
+  - name: Auth
+    description: Authentication endpoints
+  - name: Wells
+    description: Well management
+  - name: Files
+    description: File upload and parsing
+  - name: Analysis
+    description: Petroleum engineering analysis
+  - name: Cards
+    description: UI Card system
+  - name: Agents
+    description: AI Agent interaction
+
+paths:
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: User login
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  token_type:
+                    type: string
+                    example: bearer
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Invalid credentials
+
+  /auth/register:
+    post:
+      tags:
+        - Auth
+      summary: Register new user
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - name
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+                name:
+                  type: string
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /wells:
+    get:
+      tags:
+        - Wells
+      summary: List all wells
+      operationId: list_wells
+      parameters:
+        - name: field_id
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: List of wells
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  wells:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Well'
+                  total:
+                    type: integer
+
+    post:
+      tags:
+        - Wells
+      summary: Create new well
+      operationId: create_well
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WellCreate'
+      responses:
+        '201':
+          description: Well created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Well'
+
+  /wells/{well_id}:
+    get:
+      tags:
+        - Wells
+      summary: Get well details
+      operationId: get_well
+      parameters:
+        - name: well_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Well details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Well'
+
+  /wells/{well_id}/production:
+    get:
+      tags:
+        - Wells
+      summary: Get production data
+      operationId: get_production
+      parameters:
+        - name: well_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: start_date
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Production data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductionRecord'
+
+  /files/upload:
+    post:
+      tags:
+        - Files
+      summary: Upload file for parsing
+      operationId: upload_file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                file_type:
+                  type: string
+                  enum: [las, dlis, csv, petrel]
+      responses:
+        '201':
+          description: File uploaded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadedFile'
+
+  /files/{file_id}/parse:
+    post:
+      tags:
+        - Files
+      summary: Parse uploaded file
+      operationId: parse_file
+      parameters:
+        - name: file_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                options:
+                  type: object
+      responses:
+        '202':
+          description: Parsing started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParseJob'
+
+  /analysis/dca:
+    post:
+      tags:
+        - Analysis
+      summary: Run Decline Curve Analysis
+      operationId: run_dca
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DCARequest'
+      responses:
+        '200':
+          description: DCA results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DCAResult'
+
+  /analysis/volumetrics:
+    post:
+      tags:
+        - Analysis
+      summary: Run Volumetric Analysis
+      operationId: run_volumetrics
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VolumetricsRequest'
+      responses:
+        '200':
+          description: Volumetric results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VolumetricsResult'
+
+  /analysis/well-test:
+    post:
+      tags:
+        - Analysis
+      summary: Run Well Test Analysis
+      operationId: run_well_test
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WellTestRequest'
+      responses:
+        '200':
+          description: Well test results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WellTestResult'
+
+  /analysis/material-balance:
+    post:
+      tags:
+        - Analysis
+      summary: Run Material Balance Analysis
+      operationId: run_material_balance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MBRequest'
+      responses:
+        '200':
+          description: Material balance results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MBResult'
+
+  /cards/types:
+    get:
+      tags:
+        - Cards
+      summary: Get available card types
+      operationId: get_card_types
+      responses:
+        '200':
+          description: List of card types
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardType'
+
+  /cards:
+    post:
+      tags:
+        - Cards
+      summary: Create/spawn a new card
+      operationId: create_card
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardCreate'
+      responses:
+        '201':
+          description: Card created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Card'
+
+  /agents/chat:
+    post:
+      tags:
+        - Agents
+      summary: Send message to agent
+      operationId: chat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatMessage'
+      responses:
+        '200':
+          description: Agent response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+
+  /agents/memory:
+    get:
+      tags:
+        - Agents
+      summary: Get agent memory
+      operationId: get_memory
+      parameters:
+        - name: user_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Agent memory
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentMemory'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    APIKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    Well:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        field:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive, drilling, abandoned]
+        well_type:
+          type: string
+          enum: [producer, injector, observation]
+        md:
+          type: number
+          format: double
+        tvd:
+          type: number
+          format: double
+
+    WellCreate:
+      type: object
+      required:
+        - name
+        - field
+      properties:
+        name:
+          type: string
+        field:
+          type: string
+        status:
+          type: string
+        well_type:
+          type: string
+        md:
+          type: number
+        tvd:
+          type: number
+
+    ProductionRecord:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        oil_rate:
+          type: number
+          format: double
+        gas_rate:
+          type: number
+          format: double
+        water_rate:
+          type: number
+          format: double
+        bhp:
+          type: number
+          format: double
+
+    UploadedFile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        filename:
+          type: string
+        file_type:
+          type: string
+        size:
+          type: integer
+        uploaded_at:
+          type: string
+          format: date-time
+
+    ParseJob:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [pending, processing, completed, failed]
+        result:
+          type: object
+
+    DCARequest:
+      type: object
+      required:
+        - well_id
+        - production_data
+        - model_type
+      properties:
+        well_id:
+          type: string
+          format: uuid
+        production_data:
+          type: array
+          items:
+            type: object
+            properties:
+              time:
+                type: number
+              rate:
+                type: number
+        model_type:
+          type: string
+          enum: [hyperbolic, exponential, harmonic]
+        initial_rate:
+          type: number
+        decline_rate:
+          type: number
+        b_factor:
+          type: number
+
+    DCAResult:
+      type: object
+      properties:
+        model:
+          type: string
+        parameters:
+          type: object
+        forecast:
+          type: array
+          items:
+            type: object
+        eur:
+          type: number
+
+    VolumetricsRequest:
+      type: object
+      required:
+        - area
+        - thickness
+        - porosity
+        - sw
+        - bo
+      properties:
+        area:
+          type: number
+        thickness:
+          type: number
+        porosity:
+          type: number
+        sw:
+          type: number
+        bo:
+          type: number
+        distribution:
+          type: object
+
+    VolumetricsResult:
+      type: object
+      properties:
+        stoiip:
+          type: object
+          properties:
+            p10:
+              type: number
+            p50:
+              type: number
+            p90:
+              type: number
+        distribution:
+          type: array
+
+    WellTestRequest:
+      type: object
+      required:
+        - well_id
+        - pressure_data
+      properties:
+        well_id:
+          type: string
+          format: uuid
+        pressure_data:
+          type: array
+          items:
+            type: object
+
+    WellTestResult:
+      type: object
+      properties:
+        permeability:
+          type: number
+        skin:
+          type: number
+        reservoir_pressure:
+          type: number
+
+    MBRequest:
+      type: object
+      required:
+        - well_id
+        - pvt_data
+        - production_data
+      properties:
+        well_id:
+          type: string
+        pvt_data:
+          type: object
+        production_data:
+          type: array
+
+    MBResult:
+      type: object
+      properties:
+        original_gas_in_place:
+          type: number
+        drive_index:
+          type: number
+
+    CardType:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        schema:
+          type: object
+
+    Card:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+        data:
+          type: object
+        created_at:
+          type: string
+          format: date-time
+
+    CardCreate:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+        data:
+          type: object
+
+    ChatMessage:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+        context:
+          type: object
+        card_id:
+          type: string
+          format: uuid
+
+    ChatResponse:
+      type: object
+      properties:
+        response:
+          type: string
+        cards:
+          type: array
+          items:
+            $ref: '#/components/schemas/Card'
+        reasoning:
+          type: string
+
+    AgentMemory:
+      type: object
+      properties:
+        preferences:
+          type: object
+        history:
+          type: array
+        workflows:
+          type: array

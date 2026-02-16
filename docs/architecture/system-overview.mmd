@@ -1,0 +1,162 @@
+# System Architecture
+
+## Overview
+
+CYSMIC Subsurface OS is an agent-first petroleum engineering platform that enables engineers to accomplish work through natural conversation with AI agents that spawn interactive UI components on-demand.
+
+## High-Level Architecture
+
+```mermaid
+graph TB
+    subgraph Client["Frontend (React + Vite + TypeScript)"]
+        UI[UI Components<br/>shadcn/ui + Tailwind]
+        Chat[Chat Interface<br/>Agent Scaffolding]
+        Cards[Card System<br/>Registry + Renderer]
+        Store[State Management<br/>Zustand + React Query]
+        IDB[IndexedDB<br/>Offline Storage]
+    end
+
+    subgraph Gateway["API Gateway / WebSocket"]
+        WS[Socket.IO<br/>Real-time]
+        Auth[JWT Auth<br/>Rate Limiting]
+    end
+
+    subgraph Backend["Backend (FastAPI + Python)"]
+        API[REST API<br/>FastAPI]
+        Agents[Agent Orchestration<br/>Multi-model LLM]
+        WSHandler[WebSocket<br/>Handler]
+    end
+
+    subgraph Data["Data Layer"]
+        PG[(PostgreSQL<br/>+ pgvector)]
+        Redis[(Redis 7+<br/>Cache + Queue)]
+        Celery[Celery<br/>Background Jobs]
+    end
+
+    subgraph Services["Core Services"]
+        FileIng[File Ingestion<br/>LAS/DLIS/CSV/Petrel]
+        DCA[Analysis Engine<br/>DCA/Volumetrics/MB]
+        Memory[Agent Memory<br/>Preferences + History]
+        Reasoning[Reasoning Trace<br/>Explainability]
+    end
+
+    subgraph External["External Integrations"]
+        Petrel[Petrel]
+        Eclipse[Eclipse]
+        Kappa[Kappa]
+    end
+
+    Client --> Gateway
+    Gateway --> Backend
+    Backend --> Data
+    Backend --> Services
+    Backend --> External
+    Cards <--> |Sync| Backend
+    Store <--> |Cache| Redis
+    UI <--> |Offline| IDB
+```
+
+## Component Architecture
+
+```mermaid
+graph LR
+    subgraph Frontend["React Frontend"]
+        Chat[Chat Interface] --> |Spawns| Cards
+        Cards --> |State| Store
+        Store --> |Query| API
+        API --> |Real-time| WS
+    end
+
+    subgraph CardSystem["Card System"]
+        Types[Card Types<br/>6 Implemented]
+        Registry[Card Registry<br/>Registration]
+        Renderer[Card Renderer<br/>Dynamic Render]
+        State[Card State<br/>useCardState]
+    end
+
+    Cards --> Types
+    Cards --> Registry
+    Cards --> Renderer
+    Cards --> State
+```
+
+## Data Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Chat
+    participant Agent
+    participant Cards
+    participant API
+    participant DB
+
+    User->>Chat: Send message
+    Chat->>Agent: Forward to agent
+    Agent->>Agent: Process with LLM
+    Agent->>Agent: Decide on cards to spawn
+    Agent->>Cards: Return card definitions
+    Cards->>Cards: Register & render
+    Cards->>API: Request data
+    API->>DB: Query PostgreSQL
+    API-->>Cards: Return data
+    Cards-->>User: Display UI
+```
+
+## Technology Stack
+
+| Layer | Technology | Purpose |
+|-------|------------|---------|
+| Frontend | React 18+ | UI Framework |
+| Build | Vite | Development & Build |
+| Styling | TailwindCSS + shadcn/ui | Design System |
+| State | Zustand | Client State |
+| Data Fetching | TanStack Query | Server State |
+| Charts | Recharts, Plotly | Visualizations |
+| Backend | FastAPI | REST API + WebSocket |
+| Database | PostgreSQL 15+ | Primary Storage |
+| Vector DB | pgvector | Semantic Search |
+| Cache | Redis 7+ | Caching + Session |
+| Queue | Celery | Background Jobs |
+| File Parsing | lasio, dlisio | Petroleum Formats |
+| ML/Analysis | NumPy, SciPy, pandas | Engineering Calc |
+
+## Implemented Card Types
+
+1. **FileIngestionCard** - LAS/DLIS/CSV/Petrel file upload
+2. **DeclineCurveCard** - DCA visualization & analysis
+3. **VolumetricsCard** - STOIIP/OOIP calculations
+4. **WellTestCard** - Pressure transient analysis
+5. **MaterialBalanceCard** - Material balance calculations
+6. **ReportBuilderCard** - Report generation
+
+## API Endpoints Structure
+
+```
+/api/v1/
+├── /auth/
+│   ├── POST /login
+│   ├── POST /register
+│   └── POST /logout
+├── /wells/
+│   ├── GET / (list)
+│   ├── GET /{id}
+│   ├── POST /
+│   └── /{id}/production
+├── /files/
+│   ├── POST /upload
+│   └── /{id}/parse
+├── /analysis/
+│   ├── POST /dca
+│   ├── POST /volumetrics
+│   ├── POST /well-test
+│   └── POST /material-balance
+├── /cards/
+│   ├── GET /types
+│   └── POST /
+├── /agents/
+│   ├── POST /chat
+│   └── GET /memory
+└── /ws/
+    └── /socket.io/
+```
