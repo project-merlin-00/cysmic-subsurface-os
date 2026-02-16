@@ -11,7 +11,14 @@ import {
   LogViewer,
   generateDemoLogData,
   TelemetryStrip,
-  SubsurfaceViewer
+  SubsurfaceViewer,
+  MonteCarloChart,
+  VolumetricSummary,
+  WellTestChart,
+  WellTestResults,
+  MaterialBalanceChart,
+  DriveMechanismPanel,
+  ReservesSummary
 } from './components';
 
 interface Message {
@@ -129,7 +136,7 @@ function App() {
             <Bot className="w-5 h-5 text-primary-600" />
             <h1 className="text-lg font-semibold text-sandstone-900">CYSMIC Subsurface OS</h1>
             <span className="px-2 py-0.5 bg-primary-100 text-primary-700 text-xs font-medium rounded">
-              Phase 1
+              Phase 2
             </span>
           </div>
           
@@ -249,8 +256,18 @@ function App() {
               </div>
             </>
           ) : (
-            /* Demo Mode - Phase 1 Components */
+            /* Demo Mode - Phase 1 & 2 Components */
             <div className="flex-1 overflow-auto p-6 space-y-6 bg-sandstone-50">
+              {/* Phase Badge */}
+              <div className="flex items-center gap-3">
+                <span className="px-3 py-1 bg-primary-100 text-primary-700 text-sm font-medium rounded">
+                  Phase 1
+                </span>
+                <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded">
+                  Phase 2
+                </span>
+              </div>
+
               {/* File Ingestion + Parameter Panel Row */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <FileIngestionWidget />
@@ -268,7 +285,7 @@ function App() {
                 />
               </div>
 
-              {/* Decline Curve */}
+              {/* Decline Curve - Phase 1 */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2">
                   <DeclineCurveChart
@@ -283,6 +300,109 @@ function App() {
                   model={declineModel}
                   onModelChange={setDeclineModel}
                 />
+              </div>
+
+              {/* Phase 2: Volumetric Analysis (Monte Carlo) */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2">
+                  <MonteCarloChart
+                    data={{
+                      stoiip: 45.2e6,
+                      stoiip_p10: 52.1e6,
+                      stoiip_p50: 44.8e6,
+                      stoiip_p90: 38.5e6,
+                      mean: 45.2e6,
+                      std: 5.1e6,
+                      samples: Array.from({length: 500}, () => 38e6 + Math.random() * 20e6)
+                    }}
+                  />
+                </div>
+                <VolumetricSummary
+                  data={{
+                    stoiip: 45.2e6,
+                    stoiip_p10: 52.1e6,
+                    stoiip_p50: 44.8e6,
+                    stoiip_p90: 38.5e6,
+                    mean: 45.2e6,
+                    std: 5.1e6
+                  }}
+                />
+              </div>
+
+              {/* Phase 2: Well Test Analysis */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2">
+                  <WellTestChart
+                    data={{
+                      time: [0.1, 0.5, 1, 2, 5, 10, 20, 50, 100, 200],
+                      pressure: [4500, 4200, 3950, 3720, 3510, 3380, 3250, 3100, 2980, 2850],
+                      derivative: [120, 85, 62, 45, 32, 28, 25, 22, 20, 18]
+                    }}
+                  />
+                </div>
+                <WellTestResults
+                  results={{
+                    permeability: 45.2,
+                    skin: 2.5,
+                    reservoir_pressure: 3200,
+                    flow_capacity: 2260,
+                    model: 'homogeneous',
+                    diagnostics: {
+                      identified_regimes: [
+                        { regime: 'wellbore_storage', description: 'Wellbore storage dominant at early times' },
+                        { regime: 'radial_flow', description: 'Infinite acting radial flow' }
+                      ]
+                    }
+                  }}
+                />
+              </div>
+
+              {/* Phase 2: Material Balance */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <MaterialBalanceChart
+                  data={{
+                    drive_mechanism: 'solution_gas',
+                    original_oil_in_place: 25e6,
+                    original_gas_in_place: 15e9,
+                    energy_index: 0.65,
+                    drive_indicators: {
+                      pressure_decline_rate: 15.2,
+                      gor_trend: 2.5,
+                      pressure_retained: 0.68,
+                      final_gor: 850
+                    },
+                    p_over_z_data: [
+                      { pressure: 3000, z_factor: 0.85, p_over_z: 3529, cumulative_gas: 0 },
+                      { pressure: 2500, z_factor: 0.82, p_over_z: 3049, cumulative_gas: 1.2e9 },
+                      { pressure: 2000, z_factor: 0.79, p_over_z: 2532, cumulative_gas: 2.5e9 },
+                      { pressure: 1500, z_factor: 0.76, p_over_z: 1974, cumulative_gas: 3.9e9 },
+                      { pressure: 1000, z_factor: 0.73, p_over_z: 1370, cumulative_gas: 5.2e9 }
+                    ]
+                  }}
+                  type="p/z"
+                />
+                <div className="lg:col-span-2 space-y-4">
+                  <DriveMechanismPanel
+                    data={{
+                      drive_mechanism: 'solution_gas',
+                      energy_index: 0.65,
+                      drive_indicators: {
+                        pressure_decline_rate: 15.2,
+                        gor_trend: 2.5,
+                        pressure_retained: 0.68,
+                        final_gor: 850
+                      }
+                    }}
+                  />
+                  <ReservesSummary
+                    data={{
+                      drive_mechanism: 'solution_gas',
+                      original_oil_in_place: 25e6,
+                      original_gas_in_place: 15e9,
+                      energy_index: 0.65
+                    }}
+                  />
+                </div>
               </div>
 
               {/* Log Viewer */}
