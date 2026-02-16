@@ -1,28 +1,67 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, User, Bot, Loader2 } from 'lucide-react';
+import { Send, User, Bot, Loader2, Box } from 'lucide-react';
 import { Sidebar } from './components/Sidebar';
 import { Button } from './components/ui/Button';
 import { Input } from './components/ui/Input';
+import {
+  FileIngestionWidget,
+  DeclineCurveChart,
+  DeclineParameterPanel,
+  ParameterPanel,
+  LogViewer,
+  generateDemoLogData,
+  TelemetryStrip,
+  SubsurfaceViewer
+} from './components';
 
 interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
+  component?: string;
 }
 
+type ViewMode = 'chat' | 'demo';
+
 function App() {
+  const [viewMode, setViewMode] = useState<ViewMode>('chat');
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
       role: 'assistant',
-      content: 'Hello! I\'m CYSMIC, your subsurface operations assistant. How can I help you today?',
+      content: 'Hello! I\'m CYSMIC, your subsurface operations assistant. Try the demo mode to explore Phase 1 components, or ask me to analyze wells, logs, or production data.',
       timestamp: new Date(),
     },
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Demo state
+  const [declineParams, setDeclineParams] = useState({
+    qi: 500,
+    Di: 0.1,
+    b: 0.5
+  });
+  const [declineModel, setDeclineModel] = useState<'hyperbolic' | 'exponential' | 'harmonic'>('hyperbolic');
+
+  // Generate decline curve data
+  const generateDeclineData = () => {
+    const data = [];
+    for (let t = 0; t <= 60; t++) {
+      let q;
+      if (declineModel === 'exponential') {
+        q = declineParams.qi * Math.exp(-declineParams.Di * t);
+      } else if (declineModel === 'harmonic') {
+        q = declineParams.qi / (1 + declineParams.Di * t);
+      } else {
+        q = declineParams.qi / Math.pow(1 + declineParams.b * declineParams.Di * t, 1 / declineParams.b);
+      }
+      data.push({ time: t, rate: q });
+    }
+    return data;
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -46,12 +85,23 @@ function App() {
     setInput('');
     setIsLoading(true);
 
-    // Simulate API call (replace with actual backend call)
+    // Simulate API call
     setTimeout(() => {
+      const responses: Record<string, string> = {
+        'las': 'LAS file detected! I can see you have Gamma Ray, Resistivity, and Density curves. Would you like me to visualize these in the Log Viewer?',
+        'decline': 'I\'ll create a decline curve analysis for you. Let me fit an Arps model to your production data.',
+        'default': 'I understand your request. In Phase 1, we\'ve built the core components: File Ingestion, Decline Curve Analysis, Log Viewer, Telemetry Strip, and 3D Viewer. Try the demo mode to see them in action!'
+      };
+
+      const content = input.toLowerCase();
+      let response = responses.default;
+      if (content.includes('las') || content.includes('log')) response = responses.las;
+      else if (content.includes('decline') || content.includes('production')) response = responses.decline;
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: 'I understand your request. This is a demo response - the backend integration will be available in Phase 1.',
+        content: response,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, assistantMessage]);
@@ -71,100 +121,180 @@ function App() {
       {/* Sidebar */}
       <Sidebar />
 
-      {/* Main Chat Area */}
-      <main className="flex-1 flex flex-col">
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="h-14 px-6 flex items-center justify-between border-b border-sandstone-200 bg-white">
+        <header className="h-14 px-6 flex items-center justify-between border-b border-sandstone-200 bg-white flex-shrink-0">
           <div className="flex items-center gap-3">
             <Bot className="w-5 h-5 text-primary-600" />
-            <h1 className="text-lg font-semibold text-sandstone-900">CYSMIC Chat</h1>
+            <h1 className="text-lg font-semibold text-sandstone-900">CYSMIC Subsurface OS</h1>
+            <span className="px-2 py-0.5 bg-primary-100 text-primary-700 text-xs font-medium rounded">
+              Phase 1
+            </span>
           </div>
+          
+          {/* View Toggle */}
+          <div className="flex items-center gap-2 bg-sandstone-100 rounded-lg p-1">
+            <button
+              onClick={() => setViewMode('chat')}
+              className={`px-3 py-1 text-sm rounded flex items-center gap-2 transition-colors ${
+                viewMode === 'chat' 
+                  ? 'bg-white text-sandstone-900 shadow-sm' 
+                  : 'text-sandstone-600 hover:text-sandstone-800'
+              }`}
+            >
+              <Bot className="w-4 h-4" />
+              Chat
+            </button>
+            <button
+              onClick={() => setViewMode('demo')}
+              className={`px-3 py-1 text-sm rounded flex items-center gap-2 transition-colors ${
+                viewMode === 'demo' 
+                  ? 'bg-white text-sandstone-900 shadow-sm' 
+                  : 'text-sandstone-600 hover:text-sandstone-800'
+              }`}
+            >
+              <Box className="w-4 h-4" />
+              Demo
+            </button>
+          </div>
+          
           <div className="text-sm text-sandstone-500">
             Subsurface Operations Assistant
           </div>
         </header>
 
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex gap-3 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
-            >
-              {/* Avatar */}
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                  message.role === 'user'
-                    ? 'bg-primary-100 text-primary-600'
-                    : 'bg-sandstone-200 text-sandstone-700'
-                }`}
-              >
-                {message.role === 'user' ? (
-                  <User className="w-4 h-4" />
-                ) : (
-                  <Bot className="w-4 h-4" />
+        {/* Content Area */}
+        <div className="flex-1 overflow-hidden flex">
+          {viewMode === 'chat' ? (
+            <>
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                {messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex gap-3 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
+                  >
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                        message.role === 'user'
+                          ? 'bg-primary-100 text-primary-600'
+                          : 'bg-sandstone-200 text-sandstone-700'
+                      }`}
+                    >
+                      {message.role === 'user' ? (
+                        <User className="w-4 h-4" />
+                      ) : (
+                        <Bot className="w-4 h-4" />
+                      )}
+                    </div>
+
+                    <div
+                      className={`max-w-[70%] rounded-2xl px-4 py-3 ${
+                        message.role === 'user'
+                          ? 'bg-primary-600 text-white'
+                          : 'bg-white border border-sandstone-200 text-sandstone-900'
+                      }`}
+                    >
+                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                      <div
+                        className={`text-xs mt-1 ${
+                          message.role === 'user' ? 'text-primary-100' : 'text-sandstone-400'
+                        }`}
+                      >
+                        {message.timestamp.toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {isLoading && (
+                  <div className="flex gap-3">
+                    <div className="w-8 h-8 rounded-full bg-sandstone-200 text-sandstone-700 flex items-center justify-center">
+                      <Bot className="w-4 h-4" />
+                    </div>
+                    <div className="bg-white border border-sandstone-200 rounded-2xl px-4 py-3">
+                      <div className="flex items-center gap-2 text-sandstone-500">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span className="text-sm">Thinking...</span>
+                      </div>
+                    </div>
+                  </div>
                 )}
+
+                <div ref={messagesEndRef} />
               </div>
 
-              {/* Message Bubble */}
-              <div
-                className={`max-w-[70%] rounded-2xl px-4 py-3 ${
-                  message.role === 'user'
-                    ? 'bg-primary-600 text-white'
-                    : 'bg-white border border-sandstone-200 text-sandstone-900'
-                }`}
-              >
-                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                <div
-                  className={`text-xs mt-1 ${
-                    message.role === 'user' ? 'text-primary-100' : 'text-sandstone-400'
-                  }`}
-                >
-                  {message.timestamp.toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
+              {/* Input Area */}
+              <div className="p-4 border-t border-sandstone-200 bg-white">
+                <div className="flex gap-3 max-w-4xl mx-auto">
+                  <Input
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyPress}
+                    placeholder="Ask about wells, logs, decline curves..."
+                    className="flex-1"
+                    disabled={isLoading}
+                  />
+                  <Button onClick={handleSend} disabled={isLoading || !input.trim()}>
+                    <Send className="w-4 h-4" />
+                  </Button>
                 </div>
+                <p className="text-center text-xs text-sandstone-400 mt-2">
+                  Try: "analyze LAS file" or "show decline curve" or "view logs"
+                </p>
               </div>
-            </div>
-          ))}
+            </>
+          ) : (
+            /* Demo Mode - Phase 1 Components */
+            <div className="flex-1 overflow-auto p-6 space-y-6 bg-sandstone-50">
+              {/* File Ingestion + Parameter Panel Row */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <FileIngestionWidget />
+                <ParameterPanel
+                  title="Analysis Parameters"
+                  parameters={[
+                    { id: 'porosity', name: 'Porosity', value: 0.2, min: 0, max: 0.4, step: 0.01, unit: 'fraction', category: 'reservoir' },
+                    { id: 'sw', name: 'Water Saturation', value: 0.3, min: 0, max: 1, step: 0.05, unit: 'fraction', category: 'reservoir' },
+                    { id: 'thickness', name: 'Net Thickness', value: 50, min: 0, max: 200, step: 1, unit: 'ft', category: 'reservoir' },
+                    { id: 'bo', name: 'Oil FVF', value: 1.2, min: 1, max: 2, step: 0.01, unit: 'rbbl/stb', category: 'fluid' },
+                    { id: 'qi', name: 'Initial Rate', value: 500, min: 0, max: 5000, step: 10, unit: 'bbl/d', category: 'production' },
+                    { id: 'di', name: 'Decline Rate', value: 0.15, min: 0.01, max: 0.5, step: 0.01, unit: '1/mo', category: 'production' },
+                  ]}
+                  onChange={() => {}}
+                />
+              </div>
 
-          {/* Loading Indicator */}
-          {isLoading && (
-            <div className="flex gap-3">
-              <div className="w-8 h-8 rounded-full bg-sandstone-200 text-sandstone-700 flex items-center justify-center">
-                <Bot className="w-4 h-4" />
-              </div>
-              <div className="bg-white border border-sandstone-200 rounded-2xl px-4 py-3">
-                <div className="flex items-center gap-2 text-sandstone-500">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span className="text-sm">Thinking...</span>
+              {/* Decline Curve */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2">
+                  <DeclineCurveChart
+                    data={generateDeclineData()}
+                    model={declineModel}
+                    parameters={declineParams}
+                  />
                 </div>
+                <DeclineParameterPanel
+                  parameters={declineParams}
+                  onChange={setDeclineParams}
+                  model={declineModel}
+                  onModelChange={setDeclineModel}
+                />
               </div>
+
+              {/* Log Viewer */}
+              <LogViewer curves={generateDemoLogData()} />
+
+              {/* Telemetry Strip */}
+              <TelemetryStrip wells={['WELL-A01', 'WELL-A02', 'WELL-B01']} />
+
+              {/* 3D Viewer */}
+              <SubsurfaceViewer />
             </div>
           )}
-
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Input Area */}
-        <div className="p-4 border-t border-sandstone-200 bg-white">
-          <div className="flex gap-3 max-w-4xl mx-auto">
-            <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyPress}
-              placeholder="Ask about wells, logs, or operations..."
-              className="flex-1"
-              disabled={isLoading}
-            />
-            <Button onClick={handleSend} disabled={isLoading || !input.trim()}>
-              <Send className="w-4 h-4" />
-            </Button>
-          </div>
-          <p className="text-center text-xs text-sandstone-400 mt-2">
-            Press Enter to send • Shift+Enter for new line
-          </p>
         </div>
       </main>
     </div>

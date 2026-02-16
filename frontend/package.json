@@ -33,7 +33,11 @@
     "@radix-ui/react-separator": "^1.0.3",
     "lucide-react": "^0.312.0",
     "recharts": "^2.10.4",
-    "d3": "^7.8.5"
+    "d3": "^7.8.5",
+    "deck.gl": "^8.9.33",
+    "@deck.gl/core": "^8.9.33",
+    "@deck.gl/layers": "^8.9.33",
+    "@deck.gl/react": "^8.9.33"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
