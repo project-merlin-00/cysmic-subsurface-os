@@ -21,6 +21,9 @@ import {
   ReservesSummary
 } from './components';
 
+// Card System Imports
+import { CardRenderer, useCardState, createDeclineCurveCard, createLogViewerCard, createMonteCarloCard, createWellTestCard, createVolumetricsCard, createTelemetryCard } from './cards';
+
 interface Message {
   id: string;
   role: 'user' | 'assistant';
@@ -33,6 +36,19 @@ type ViewMode = 'chat' | 'demo';
 
 function App() {
   const [viewMode, setViewMode] = useState<ViewMode>('chat');
+  
+  // Card System State
+  const {
+    cards,
+    activeCardId,
+    maximizedCardId,
+    spawnCard,
+    closeCard,
+    minimizeCard,
+    maximizeCard,
+    setActiveCard,
+    updateCard,
+  } = useCardState({ maxCards: 10 });
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -258,15 +274,129 @@ function App() {
           ) : (
             /* Demo Mode - Phase 1 & 2 Components */
             <div className="flex-1 overflow-auto p-6 space-y-6 bg-sandstone-50">
-              {/* Phase Badge */}
-              <div className="flex items-center gap-3">
-                <span className="px-3 py-1 bg-primary-100 text-primary-700 text-sm font-medium rounded">
-                  Phase 1
-                </span>
-                <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded">
-                  Phase 2
-                </span>
+              {/* Card System Demo */}
+              <div className="bg-white border border-sandstone-300 rounded-lg p-4 shadow-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center">
+                      <Box className="w-4 h-4 text-primary-600" />
+                    </div>
+                    <div>
+                      <h2 className="font-space font-semibold text-sandstone-900">Card System Demo</h2>
+                      <p className="text-xs text-sandstone-500">Click to spawn interactive cards</p>
+                    </div>
+                  </div>
+                  <div className="text-xs text-sandstone-500">
+                    Active cards: {cards.length}
+                  </div>
+                </div>
+                
+                {/* Card Spawn Buttons */}
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => spawnCard('declineCurve', 'Well A-1 Decline', {
+                      type: 'declineCurve',
+                      declineType: 'hyperbolic',
+                      qi: 2000,
+                      Di: 0.15,
+                      b: 0.5,
+                      wellName: 'Well A-1'
+                    } as any)}
+                    className="px-3 py-2 bg-primary-100 text-primary-700 rounded-lg text-sm font-medium hover:bg-primary-200 transition-colors flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                    </svg>
+                    Decline Curve
+                  </button>
+                  
+                  <button
+                    onClick={() => spawnCard('logViewer', 'Well A-1 Logs', {
+                      type: 'logViewer',
+                      wellName: 'Well A-1',
+                      topDepth: 1500,
+                      bottomDepth: 3500
+                    } as any)}
+                    className="px-3 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium hover:bg-green-200 transition-colors flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    Log Viewer
+                  </button>
+                  
+                  <button
+                    onClick={() => spawnCard('monteCarlo', 'STOIIP Monte Carlo', {
+                      type: 'monteCarlo',
+                      iterations: 5000
+                    } as any)}
+                    className="px-3 py-2 bg-amber-100 text-amber-700 rounded-lg text-sm font-medium hover:bg-amber-200 transition-colors flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    Monte Carlo
+                  </button>
+                  
+                  <button
+                    onClick={() => spawnCard('wellTest', 'Well A-1 Test', {
+                      type: 'wellTest',
+                      testType: 'drawdown',
+                      wellName: 'Well A-1'
+                    } as any)}
+                    className="px-3 py-2 bg-purple-100 text-purple-700 rounded-lg text-sm font-medium hover:bg-purple-200 transition-colors flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Well Test
+                  </button>
+                  
+                  <button
+                    onClick={() => spawnCard('volumetrics', 'Reservoir A Volumetrics', {
+                      type: 'volumetrics',
+                      reservoirName: 'Reservoir A'
+                    } as any)}
+                    className="px-3 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-medium hover:bg-red-200 transition-colors flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                    Volumetrics
+                  </button>
+                  
+                  <button
+                    onClick={() => spawnCard('telemetry', 'Well A-1 Live', {
+                      type: 'telemetry',
+                      wellName: 'Well A-1'
+                    } as any)}
+                    className="px-3 py-2 bg-cyan-100 text-cyan-700 rounded-lg text-sm font-medium hover:bg-cyan-200 transition-colors flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    Telemetry
+                  </button>
+                </div>
               </div>
+
+              {/* Card Renderer Container - Overlays on demo */}
+              {cards.length > 0 && (
+                <div className="fixed inset-0 pointer-events-none z-50">
+                  <CardRenderer
+                    cards={cards}
+                    activeCardId={activeCardId}
+                    maximizedCardId={maximizedCardId}
+                    onClose={closeCard}
+                    onMinimize={minimizeCard}
+                    onMaximize={maximizeCard}
+                    onFocus={setActiveCard}
+                    onUpdate={updateCard}
+                    draggable={true}
+                    animated={true}
+                  />
+                </div>
+              )}
 
               {/* File Ingestion + Parameter Panel Row */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

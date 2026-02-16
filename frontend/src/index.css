@@ -130,3 +130,135 @@
     background-image: linear-gradient(135deg, #d44211 0%, #e86f42 100%);
   }
 }
+
+/* ============================================================================
+   CYSMIC Card System Animations
+   ============================================================================ */
+
+@keyframes cardSpawnIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes cardSpawnSlide {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes cardSpawnFade {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes cardCloseOut {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+@keyframes gaugePulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes dataStream {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 100% 0%;
+  }
+}
+
+@keyframes alertPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Card animation classes */
+.card-spawn {
+  animation: cardSpawnIn 0.3s ease-out forwards;
+}
+
+.card-spawn-slide {
+  animation: cardSpawnSlide 0.3s ease-out forwards;
+}
+
+.card-spawn-fade {
+  animation: cardSpawnFade 0.2s ease-out forwards;
+}
+
+.card-close {
+  animation: cardCloseOut 0.2s ease-in forwards;
+}
+
+.card-maximized {
+  transition: all 0.3s ease-out;
+}
+
+/* Gauge animations */
+.gauge-live {
+  animation: gaugePulse 2s ease-in-out infinite;
+}
+
+.gauge-updating {
+  animation: dataStream 1s linear infinite;
+  background: linear-gradient(90deg, transparent, rgba(212, 65, 17, 0.1), transparent);
+  background-size: 200% 100%;
+}
+
+/* Alert animations */
+.alert-critical {
+  animation: alertPulse 1s ease-in-out infinite;
+}
+
+/* Card container styles */
+.card-container {
+  transition: box-shadow 0.2s ease-out, border-color 0.2s ease-out;
+}
+
+.card-container:hover {
+  box-shadow: 4px 4px 0px rgba(199, 192, 176, 0.5);
+}
+
+.card-container.ring-2 {
+  box-shadow: 0 0 0 2px #d44211, 4px 4px 0px rgba(199, 192, 176, 0.4);
+}
+
+/* Collapsed card indicator */
+.card-collapsed-indicator {
+  cursor: pointer;
+}
+
+.card-collapsed-indicator:hover {
+  background-color: #DCD7CC;
+}
