@@ -1,0 +1,132 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: #d44211;
+    --color-background: #f8f6f6;
+    --color-foreground: #2d2a25;
+  }
+
+  body {
+    @apply bg-background-light text-sandstone-900 font-sans;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Panel style */
+  .panel {
+    @apply border border-sandstone-300 bg-white;
+    box-shadow: 2px 2px 0px rgba(199, 192, 176, 0.4);
+  }
+
+  .panel::before {
+    content: '';
+    @apply absolute top-0 left-0;
+    border-top: 2px solid var(--color-primary);
+    border-left: 2px solid var(--color-primary);
+  }
+
+  .panel::after {
+    content: '';
+    @apply absolute bottom-0 right-0;
+    border-bottom: 2px solid var(--color-primary);
+    border-right: 2px solid var(--color-primary);
+  }
+
+  /* Technical text */
+  .text-technical {
+    @apply font-mono text-xs tracking-wider uppercase;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-sandstone-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-sandstone-300 rounded;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-sandstone-400;
+  }
+}
+
+@layer components {
+  /* Chat message bubbles */
+  .message-user {
+    @apply bg-primary-600 text-white rounded-2xl rounded-br-md;
+  }
+
+  .message-assistant {
+    @apply bg-sandstone-100 text-sandstone-900 rounded-2xl rounded-bl-md;
+  }
+
+  /* Input field */
+  .input-field {
+    @apply w-full px-4 py-3 bg-white border border-sandstone-300 rounded-lg;
+    @apply focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary;
+    @apply placeholder:text-sandstone-400;
+  }
+
+  /* Button */
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-150;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
+  }
+
+  .btn-primary {
+    @apply bg-primary-600 text-white hover:bg-primary-700;
+  }
+
+  .btn-secondary {
+    @apply bg-sandstone-200 text-sandstone-800 hover:bg-sandstone-300;
+  }
+
+  /* Card */
+  .card {
+    @apply bg-white border border-sandstone-200 rounded-lg p-4;
+    @apply shadow-panel hover:shadow-panel-hover transition-shadow duration-150;
+  }
+
+  /* Status badge */
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-producing {
+    @apply bg-green-100 text-green-800;
+  }
+
+  .badge-drilling {
+    @apply bg-amber-100 text-amber-800;
+  }
+
+  .badge-shut-in {
+    @apply bg-red-100 text-red-800;
+  }
+}
+
+@layer utilities {
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Text gradient */
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #d44211 0%, #e86f42 100%);
+  }
+}
