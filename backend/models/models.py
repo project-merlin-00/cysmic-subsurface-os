@@ -150,3 +150,102 @@ class AnalysisResult(Base, TimestampMixin):
     charts = Column(JSON)      # Chart configurations
     
     is_archived = Column(Boolean, default=False)
+
+
+# ============================================
+# Phase 4: Collaboration & Integration Models
+# ============================================
+
+class Annotation(Base, TimestampMixin):
+    """Annotations on chat messages - comments, highlights, threads"""
+    __tablename__ = "annotations"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    message_id = Column(Integer, ForeignKey("messages.id"))
+    user_id = Column(Integer, ForeignKey("users.id"))
+    
+    content = Column(Text, nullable=False)
+    annotation_type = Column(String(20), default="comment")  # highlight, comment, reply, resolved
+    parent_annotation_id = Column(Integer, ForeignKey("annotations.id"), nullable=True)
+    highlights = Column(JSON, default=list)  # Text ranges to highlight
+    
+    is_resolved = Column(Boolean, default=False)
+    
+    # Relationships
+    message = relationship("Message", backref="annotations")
+    user = relationship("User", backref="annotations")
+    parent = relationship("Annotation", remote_side=[id], backref="replies")
+
+
+class MentionNotification(Base, TimestampMixin):
+    """User mentions and notifications"""
+    __tablename__ = "mention_notifications"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    message_id = Column(Integer, ForeignKey("messages.id"))
+    mentioned_user_id = Column(Integer, ForeignKey("users.id"))
+    mentioned_by_user_id = Column(Integer, ForeignKey("users.id"))
+    is_read = Column(Boolean, default=False)
+    
+    # Relationships
+    message = relationship("Message", backref="mentions")
+    mentioned_user = relationship("User", foreign_keys=[mentioned_user_id], backref="notifications")
+    mentioned_by = relationship("User", foreign_keys=[mentioned_by_user_id])
+
+
+class ReportTemplate(Base, TimestampMixin):
+    """Report templates for PDF/DOCX/PPTX generation"""
+    __tablename__ = "report_templates"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(255), nullable=False)
+    description = Column(Text)
+    format = Column(String(20), nullable=False)  # pdf, docx, pptx
+    sections = Column(JSON, default=list)  # Template structure
+    is_default = Column(Boolean, default=False)
+    
+    # Owner
+    owner_id = Column(Integer, ForeignKey("users.id"))
+    owner = relationship("User", backref="report_templates")
+
+
+class Report(Base, TimestampMixin):
+    """Generated reports"""
+    __tablename__ = "reports"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(255), nullable=False)
+    format = Column(String(20), nullable=False)  # pdf, docx, pptx
+    file_path = Column(String(500))
+    download_url = Column(String(500))
+    status = Column(String(20), default="generating")  # generating, completed, failed
+    
+    # Template used
+    template_id = Column(Integer, ForeignKey("report_templates.id"), nullable=True)
+    template = relationship("ReportTemplate")
+    
+    # Report data
+    wells = Column(JSON, default=list)
+    analyses = Column(JSON, default=list)
+    sections = Column(JSON, default=list)
+    
+    # Owner
+    owner_id = Column(Integer, ForeignKey("users.id"))
+    owner = relationship("User", backref="reports")
+    
+    # Timestamps
+    completed_at = Column(DateTime, nullable=True)
+
+
+class IntegrationSync(Base, TimestampMixin):
+    """Track sync status with external tools (Petrel, Eclipse, Kappa)"""
+    __tablename__ = "integration_syncs"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    source = Column(String(50), nullable=False)  # petrel, eclipse, kappa
+    entity_type = Column(String(50))  # well, seismic, model
+    entity_id = Column(String(100))
+    external_id = Column(String(255))
+    sync_status = Column(String(20), default="pending")  # pending, synced, failed
+    last_sync = Column(DateTime, nullable=True)
+    sync_errors = Column(JSON, default=list)

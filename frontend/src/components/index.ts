@@ -1,4 +1,4 @@
-// Components Index - CYSMIC Phase 1 & 2
+// Components Index - CYSMIC Phase 1-4
 
 // Ingestion
 export { FileIngestionWidget } from './ingestion/FileIngestionWidget';
@@ -17,3 +17,12 @@ export { MaterialBalanceChart, DriveMechanismPanel, ReservesSummary } from './an
 export { LogViewer, generateDemoLogData } from './viewers/LogViewer';
 export { TelemetryStrip } from './viewers/TelemetryStrip';
 export { SubsurfaceViewer } from './viewers/SubsurfaceViewer';
+
+// Phase 4 - Collaboration
+export { AnnotationPanel, NotificationBell, ChatSearch } from './collaboration/AnnotationComponents';
+
+// Phase 4 - Report Builder
+export { ReportBuilder, ExportButton } from './reports/ReportBuilder';
+
+// Phase 4 - Integration
+export { IntegrationPanel } from './integration/IntegrationPanel';

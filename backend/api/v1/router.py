@@ -3,7 +3,7 @@ API Router - V1
 """
 from fastapi import APIRouter
 
-from backend.api.v1.endpoints import auth, wells, conversations, chat, files, decline, volumetric, welltest, material_balance, phase3
+from backend.api.v1.endpoints import auth, wells, conversations, chat, files, decline, volumetric, welltest, material_balance, phase3, collaboration, integration, reports
 
 api_router = APIRouter()
 
@@ -17,3 +17,6 @@ api_router.include_router(volumetric.router, prefix="/volumetric", tags=["Volume
 api_router.include_router(welltest.router, prefix="/welltest", tags=["Well Test Analysis"])
 api_router.include_router(material_balance.router, prefix="/material-balance", tags=["Material Balance"])
 api_router.include_router(phase3.router, prefix="/phase3", tags=["Phase 3 - Intelligence & Learning"])
+api_router.include_router(collaboration.router, prefix="/collaboration", tags=["Phase 4 - Collaboration"])
+api_router.include_router(integration.router, prefix="/integration", tags=["Phase 4 - Integration"])
+api_router.include_router(reports.router, prefix="/reports", tags=["Phase 4 - Report Builder"])
