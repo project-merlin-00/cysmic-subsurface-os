@@ -1,6 +1,6 @@
 """
 Celery Configuration
-Background job processing
+Phase 3: Intelligence & Learning - Background job processing
 """
 from celery import Celery
 from celery.schedules import crontab
@@ -15,8 +15,7 @@ celery_app = Celery(
     broker=settings.redis_url,
     backend=settings.redis_url,
     include=[
-        "backend.tasks.analysis",
-        "backend.tasks.data_processing",
+        "backend.tasks.monitoring",
     ]
 )
 
@@ -39,11 +38,36 @@ celery_app.conf.update(
     # Result backend settings
     result_expires=3600,  # 1 hour
     
-    # Beat schedule (for periodic tasks)
+    # Beat schedule (for periodic tasks) - Phase 3 Proactive Monitoring
     beat_schedule={
+        # Check well thresholds every 15 minutes
+        "check-wells-15min": {
+            "task": "backend.tasks.monitoring.check_all_wells",
+            "schedule": 900,  # 15 minutes
+        },
+        
+        # Generate daily report at 6 AM
+        "daily-monitoring-report": {
+            "task": "backend.tasks.monitoring.generate_monitoring_report",
+            "schedule": crontab(hour=6, minute=0),
+        },
+        
+        # Weekly cleanup on Sundays at 2 AM
+        "weekly-alert-cleanup": {
+            "task": "backend.tasks.monitoring.cleanup_old_alerts",
+            "schedule": crontab(hour=2, minute=0, day_of_week=0),
+        },
+        
+        # Health check every 5 minutes
+        "health-check-5min": {
+            "task": "backend.tasks.monitoring.health_check",
+            "schedule": 300,  # 5 minutes
+        },
+        
+        # Old sessions cleanup every 6 hours
         "cleanup-old-sessions": {
             "task": "backend.tasks.maintenance.cleanup_sessions",
-            "schedule": crontab(minute="0", hour="*/6"),  # Every 6 hours
+            "schedule": crontab(minute=0, hour="*/6"),
         },
     },
 )
